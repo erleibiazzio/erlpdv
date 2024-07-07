@@ -1,5 +1,5 @@
 <template>
-    Start da aplicação
+    <e-auth></e-auth>
 </template>
 <script>
 
