@@ -19,4 +19,13 @@ module.exports = {
       },
     },
   },
+  devServer: {
+    proxy: {
+      '/check-licences': {
+        target: 'http://localhost',
+        changeOrigin: true,
+        pathRewrite: { '^/check-licences': '/check-licences' },
+      },
+    },
+  },
 };

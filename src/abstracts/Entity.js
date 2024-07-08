@@ -1,7 +1,7 @@
 // src/abstracts/Entity.js
 const { Model, DataTypes } = require('sequelize');
-const McDate = require('../Helpers/McDate');
-const Response = require('../Helpers/Response');
+const McDate = require('../Helpers/McDate').default;
+const Response = require('../Helpers/Response').default;
 
 class Entity extends Model {
     static init(attributes, options) {
@@ -81,18 +81,27 @@ class Entity extends Model {
         let response;
 
         try {
+            await this.populate(data);
+            await this.save();
+            response = new Response('success', 'Dados atualizados com sucesso', { entity: this });
+            return response.render();
+        } catch (error) {
+            response = new Response('error', 'Não foi possivel atualizar os dados', { entity: this });
+            return response.render();
+        }
+    }
+
+    /**
+     * Faz a população da entidade
+     * @param { object } data 
+     */
+    async populate(data) {
+        try {
             Object.keys(data).forEach((field) => {
                 this[field] = data[field];
             });
-
-            // Salva as alterações
-            await this.save();
-            
-            response = new Response('success', 'Dados atualizados com sucesso', {entity: this});
-            return response.render();
         } catch (error) {
-            response = new Response('error', 'Não foi possivel atualizar os dados', {entity: this});
-            return response.render();
+            throw new Error(`Erro ao popular a entidade: ${error.message}`);
         }
     }
 

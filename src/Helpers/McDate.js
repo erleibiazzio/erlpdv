@@ -150,4 +150,4 @@ class McDate {
     }
 }
 
-module.exports = McDate;
+export default McDate;

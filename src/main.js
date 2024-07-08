@@ -3,6 +3,8 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { Icon } from '@iconify/vue';
 
+import API from './Helpers/API'; // Importe a classe API
+
 // Importando Bootstrap CSS e JavaScript
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -10,7 +12,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import router from './router';
 
 // Importação de classes Helpers Globais
-const Utils = require('./Helpers/Utils');
+const Utils = require('./Helpers/Utils').default;
 
 // Importando o arquivo global de estilos SCSS
 import './assets/sass/global.scss';
@@ -24,6 +26,9 @@ const app = createApp(App);
 // Registrando entidades de forma global
 app.config.globalProperties.$Licence = Licence;
 app.config.globalProperties.$__i = Utils.__i;
+
+const api = new API();
+app.config.globalProperties.$api = api;
 
 // Registrando valores de forma global
 app.config.globalProperties.$licenceActive = await Licence.isActive();

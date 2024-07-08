@@ -2,7 +2,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 const Entity = require('../abstracts/Entity');
-const McDate = require('../Helpers/McDate');
+const McDate = require('../Helpers/McDate').default;
 
 
 class Licence extends Entity {
@@ -42,6 +42,14 @@ Licence.init({
     organization: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            notNull: {
+                msg: 'O Nome da empresa é obrigatório'
+            },
+            notEmpty: {
+                msg: 'O Nome da empresa é obrigatório'
+            },
+        }
     },
     expiration: {
         type: DataTypes.DATE,
@@ -60,6 +68,14 @@ Licence.init({
     serial: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            notNull: {
+                msg: 'A chave de ativação é obrigatória'
+            },
+            notEmpty: {
+                msg: 'A chave de ativação é obrigatória'
+            },
+        }
     }
 }, {
     sequelize,
