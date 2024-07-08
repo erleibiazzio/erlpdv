@@ -1,11 +1,18 @@
 <template>
-    <e-auth v-if="$licenceActive"></e-auth>
+    <e-theme v-if="hasLicence"></e-theme>
+    <e-active v-if="!hasLicence"></e-active>
 </template>
 <script>
 
 export default {
     name: 'App',
-    components: {
+    data() {
+        return {
+            hasLicence: false,
+        };
+    },
+    async mounted() {
+        this.hasLicence = await this.$Licence.getLicence() ? true : false;
     }
 }
 </script>

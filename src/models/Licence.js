@@ -2,7 +2,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 const Entity = require('../abstracts/Entity');
-const McDate = require('../Utils/McDate');
+const McDate = require('../Helpers/McDate');
 
 
 class Licence extends Entity {
