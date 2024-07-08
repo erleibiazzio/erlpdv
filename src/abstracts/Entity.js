@@ -1,39 +1,48 @@
 // src/abstracts/Entity.js
 const { Model, DataTypes } = require('sequelize');
+const McDate = require('../Helpers/McDate');
+const Response = require('../Helpers/Response');
 
 class Entity extends Model {
     static init(attributes, options) {
-
-        const firstAtributes = {
+        const firstAttributes = {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-        }
+        };
 
-        const LastAttributes = {
+        const lastAttributes = {
             createdAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW
+                defaultValue: DataTypes.NOW,
+                get() {
+                    const rawValue = this.getDataValue('createdAt');
+                    return new McDate(rawValue);
+                },
             },
             updatedAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW
+                defaultValue: DataTypes.NOW,
+                get() {
+                    const rawValue = this.getDataValue('updatedAt');
+                    return new McDate(rawValue);
+                },
             },
-        }
+        };
 
-        const AllAtributes = {
-            ...firstAtributes,
+        const allAttributes = {
+            ...firstAttributes,
             ...attributes,
-            ...LastAttributes,
+            ...lastAttributes,
         };
 
         options = options || {};
         options.timestamps = true; // Adding common option for timestamps
-        return super.init(AllAtributes, options);
+        return super.init(allAttributes, options);
     }
 
     /**
@@ -62,6 +71,31 @@ class Entity extends Model {
             throw new Error(`Failed to fetch entity: ${error.message}`);
         }
     }
+
+    /**
+     * Atualiza a entidade com os dados fornecidos
+     * @param {Object} data 
+     * @returns Entity
+     */
+    async update(data) {
+        let response;
+
+        try {
+            Object.keys(data).forEach((field) => {
+                this[field] = data[field];
+            });
+
+            // Salva as alterações
+            await this.save();
+            
+            response = new Response('success', 'Dados atualizados com sucesso', {entity: this});
+            return response.render();
+        } catch (error) {
+            response = new Response('error', 'Não foi possivel atualizar os dados', {entity: this});
+            return response.render();
+        }
+    }
+
 }
 
 module.exports = Entity;

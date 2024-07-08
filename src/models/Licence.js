@@ -13,7 +13,7 @@ class Licence extends Entity {
      */
     static async getLicence() {
         try {
-            const entity = await this.findOne();
+            const entity = await this.findBy();
             return entity;
         } catch (error) {
             throw new Error(`Failed to fetch entity: ${error.message}`);
@@ -29,14 +29,13 @@ class Licence extends Entity {
         let isActive = false;
         
         if(licence) {
-            let expiration = new McDate(licence.expiration);
-            if(expiration.isFuture() && licence.status) {
+            if(licence.expiration.isFuture() && licence.status && licence.serial) {
                 isActive = true;
             }
         }
       
         return isActive;
-    }
+    }    
 }
 
 Licence.init({
@@ -47,7 +46,11 @@ Licence.init({
     expiration: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        get() {
+            const rawValue = this.getDataValue('expiration');
+            return new McDate(rawValue);
+        }
     },
     status: {
         type: DataTypes.BOOLEAN,

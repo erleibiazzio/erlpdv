@@ -1,6 +1,7 @@
 // src/main.js
 import { createApp } from 'vue';
 import App from './App.vue';
+import { Icon } from '@iconify/vue';
 
 // Importando Bootstrap CSS e JavaScript
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,17 +29,16 @@ app.config.globalProperties.$__i = Utils.__i;
 app.config.globalProperties.$licenceActive = await Licence.isActive();
 
 // Importando componentes
-import EAuth from './components/e-auth/ErIndex.vue';
-import EActive from './components/e-active/ErIndex.vue';
 import ETheme from './components/e-theme/ErIndex.vue';
-import EUsers from './components/e-users/ErIndex.vue';
 import EDashboard from './components/e-dashboard/ErIndex.vue';
+import ECard from './components/e-card/ErIndex.vue';
+import EAlert from './components/e-alert/ErIndex.vue';
 
-app.component('e-active', EActive);
-app.component('e-auth', EAuth);
+app.component('e-alert', EAlert);
 app.component('e-theme', ETheme);
-app.component('e-users', EUsers);
+app.component('e-card', ECard);
 app.component('e-dashboard', EDashboard);
+app.component('e-icon', Icon);
 
 // roteador
 app.use(router);

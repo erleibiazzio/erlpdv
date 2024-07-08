@@ -1,7 +1,7 @@
 <template>
-    <e-theme v-if="hasLicence"></e-theme>
-    <e-active v-if="!hasLicence"></e-active>
-</template>
+    <router-view></router-view>
+  </template>
+
 <script>
 
 export default {

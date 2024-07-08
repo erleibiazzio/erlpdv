@@ -1,12 +1,28 @@
-<div class="container">
-    <h2>{{$__i('Ativar cliente')}}</h2>
-    <div class="row">
-        <div class="form-group">
-            <div class="col-md-6">
-                <label for="organization">{{$__i('Nome da empresa')}}</label>
-                <input type="text" id="organization" v-model="entity.organization" :placeholder="$__i('Nome da empresa')">
+<div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <e-card>
+        <template #header>
+            <h2>{{$__i('Ativar cliente')}}</h2>
+        </template>
+        <template #content>
+            <div class="row g-">
+                <div class="col">
+                    <label for="organization">{{$__i('Nome da empresa')}}</label>
+                    <input v-model="entity.organization" type="text" class="form-control"
+                        :placeholder="$__i('Nome da empresa')">
+                </div>
+                <div class="col">
+                    <label for="serial">{{$__i('Chave de ativação')}}</label>
+                    <input v-model="entity.serial" type="text" class="form-control"
+                        :placeholder="$__i('Chave de ativação')">
+                </div>
             </div>
-        </div>
-    </div>
-    <button type="submit">Cadastrar</button>
+
+            <div class="row g- mt-3">
+                <div class="col text-center">
+                    <e-alert v-if="response" :response="response"></e-alert>
+                    <button type="button" class="btn btn-primary" @click="active()">{{$__i('Ativar')}}</button>
+                </div>
+            </div>
+        </template>
+    </e-card>
 </div>
