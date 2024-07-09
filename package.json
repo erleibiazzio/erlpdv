@@ -15,10 +15,12 @@
   "dependencies": {
     "@iconify/vue": "^4.1.2",
     "@popperjs/core": "^2.11.8",
+    "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
     "dotenv": "^16.4.5",
     "mariadb": "^3.3.1",
+    "node-persist": "^4.0.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "vue": "^3.2.13",

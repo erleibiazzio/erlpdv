@@ -104,7 +104,6 @@ class Entity extends Model {
             throw new Error(`Erro ao popular a entidade: ${error.message}`);
         }
     }
-
 }
 
 module.exports = Entity;

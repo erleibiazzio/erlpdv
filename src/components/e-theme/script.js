@@ -1,3 +1,4 @@
+import { destroySession } from '../../session'
 export default {
     name: 'e-theme',
     data() {
@@ -7,7 +8,12 @@ export default {
             version: process.env.VUE_APP_VERSION
         };
     },
-    methods: {},
+    methods: {
+        async logout() {
+            let sessionStorage = localStorage.getItem('sessionId');
+            await destroySession(sessionStorage);
+        }
+    },
     async mounted() {
         this.licenceActive = await this.$licenceActive;
         this.info = await this.$Licence.getLicence();

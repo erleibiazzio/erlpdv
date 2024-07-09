@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const saltRounds = 12;
 class Utils {
 
     /**
@@ -8,6 +10,21 @@ class Utils {
     static __i(value) {
         return value
     }
+
+
+    /**
+     * 
+     * @param { string } password 
+     * @returns 
+     */
+    static async encryptPassword(password) {
+        return bcrypt.hash(password, saltRounds);
+    }
+
+    static async verifyPassword(password, hash) {
+        return bcrypt.compare(password, hash);
+    }
+
 }
 
 export default Utils;

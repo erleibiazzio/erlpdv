@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Licence from '../models/Licence';
+import { getSession } from '../session';
 
 
 // Importe seus componentes e configure suas rotas
@@ -31,7 +32,7 @@ const routes = [
         component: EUsers,
         meta: { requiresAuth: true } // Esta rota requer autenticação
     },
-    
+
     // Outras rotas aqui
 ];
 
@@ -41,7 +42,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    const isAuthenticated = false; // Substitua pela lógica real de verificação de autenticação
+    const isAuthenticated = await checkAuthentication();
     const isActive = await Licence.isActive();
 
     if (!isActive && to.path !== '/active') {
@@ -56,5 +57,17 @@ router.beforeEach(async (to, from, next) => {
         next();
     }
 });
+
+async function checkAuthentication() {
+    let sessionStorage = localStorage.getItem('sessionId');
+    if (sessionStorage) {
+        let session = await getSession(sessionStorage)
+        if (session && session.sessionId == sessionStorage) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 export default router;

@@ -2,13 +2,14 @@
     <form class="login-form">
         <h2>Faça Login</h2>
         <div class="form-group">
-            <label for="user">Usuário</label>
-            <input type="text" id="user" v-model="entity.user" placeholder="Informe seu usuário">
+            <label for="username">Usuário</label>
+            <input type="text" id="username" v-model="entity.username" placeholder="Informe seu usuário">
         </div>
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" v-model="entity.password" placeholder="Informe sua senha">
         </div>
-        <button type="submit">Entrar</button>
+        <e-alert v-if="response" :response="response"></e-alert>
+        <button type="button" class="btn btn-primary" @click="login()">Entrar</button>
     </form>
 </div>
