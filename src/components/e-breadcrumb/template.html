@@ -1,0 +1,22 @@
+<div class="breadcrumb-area">
+    <slot name="breadcrumb-area">
+        <div class="description">
+            <div>
+                <e-icon v-if="icon" :name="icon" :size="sizeIcon"></e-icon>
+            </div>
+
+            <div>
+                <h5>{{label}}</h5>
+            </div>
+        </div>
+
+        <div class="nav">
+            <ol class="breadcrumb" >
+                <template v-for="nav in navigation">
+                    <li v-if="nav?.route" class="breadcrumb-item"><a :href="nav.route">{{nav.label}}</a></li>
+                    <li v-if="!nav?.route" class="breadcrumb-item">{{nav.label}}</li>
+                </template>
+            </ol>
+        </div>
+    </slot>
+</div>

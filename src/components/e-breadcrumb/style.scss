@@ -1,0 +1,13 @@
+.breadcrumb-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: solid 1px #e9e6e6;
+    margin-bottom: 10px;
+
+    .description {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+}

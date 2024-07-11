@@ -26,7 +26,7 @@ class McDate {
         let year = this._date.getFullYear();
         let month = String(this._date.getMonth() + 1).padStart(2, '0');
         let day = String(this._date.getDate()).padStart(2, '0');
-        
+
         if (options === 'date') {
             return `${year}-${month}-${day}`;
         } else if (options === 'time') {
@@ -35,6 +35,48 @@ class McDate {
             const time = this.time('full');
             return `${year}-${month}-${day} ${time}`;
         }
+    }
+
+    dateTime(options) {
+        let result = null;
+        if (options === 'sql') {
+            let timeType = '2-digit';
+            if(options.includes('long')) {
+                timeType = timeType + ' long';
+            }
+
+            result = this.sql('date') + ' ' + this.time(timeType);
+            return result;
+        } else {
+            options = options?.split(' ') || ['long'];
+            const config = { day: 'numeric' };
+
+            if (options.includes('year')) {
+                config.year = 'numeric';
+            }
+
+            for (let val of ["2-digit", "numeric", "narrow", "short", "long"]) {
+                if (options.includes(val)) {
+                    config.month = val;
+                }
+            }
+
+            if (config.month === '2-digit' || config.month === 'numeric') {
+                config.day = config.month;
+            }
+
+            config.hour = '2-digit';
+            config.minute = '2-digit';
+
+            if (options.includes('long')) {
+                config.second = '2-digit';
+            }
+
+            result = this.format(config);
+            return result;
+        }
+
+
     }
 
     date(options) {

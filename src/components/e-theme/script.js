@@ -5,13 +5,17 @@ export default {
         return {
             licenceActive: false,
             info: {},
-            version: process.env.VUE_APP_VERSION
+            version: process.env.VUE_APP_VERSION,
+            showUserAction: false
         };
     },
     methods: {
         async logout() {
             let sessionStorage = localStorage.getItem('sessionId');
             await destroySession(sessionStorage);
+        },
+        toggleUserAction() {
+            this.showUserAction = !this.showUserAction
         }
     },
     async mounted() {

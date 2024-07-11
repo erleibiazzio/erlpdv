@@ -1,0 +1,13 @@
+<div v-if="is('text')" class="form-group">
+    <label for="username">{{label}}</label>
+    <input :type="type" id="username" v-model="entity[prop]" :placeholder="placeholder" class="form-control">
+</div>
+
+<div v-if="is('select')" class="form-group">
+    <label for="username">{{label}}</label>
+    <select class="form-select">
+        <template v-for="item in options">
+                <option :value="item.value">{{item.label}}</option>
+        </template>
+    </select>
+</div>

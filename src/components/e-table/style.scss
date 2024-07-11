@@ -1,0 +1,18 @@
+.e-table {
+    .add {
+        margin-top: 20px;
+    }
+
+    .filters {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 60px;
+        label {
+            font-weight: normal;
+        }
+    }
+
+    table {
+        border: solid 1px #e6e5e5;
+    }
+}
