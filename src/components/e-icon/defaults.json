@@ -1,7 +1,16 @@
 {
     "add": "carbon:add-alt",
+    "arrow-left": "ic:baseline-arrow-left",
+    "arrow-right": "ic:baseline-arrow-right",
     "avatar": "carbon:user-avatar",
     "dashboard": "material-symbols-light:dashboard-outline",
+    "edit": "mage:edit",
+    "error": "weui:error-outlined",
+    "locked": "mdi:lock-off-outline",
     "noIcon": "tdesign:file-icon",
-    "users": "ph:users-three-thin"
+    "success": "clarity:success-standard-line",
+    "trash": "iconamoon:trash-light",
+    "unlocked": "mdi:unlocked-check-outline",
+    "users": "ph:users-three-thin",
+    "warning": "ph:warning-light"
 }

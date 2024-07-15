@@ -1,4 +1,51 @@
 <e-theme>
     <e-breadcrumb :label="$__i('Usuários')" icon="users" :navigation="breadcrumb"></e-breadcrumb>
-    <e-table type="User" :columns="columns"></e-table>
+    <e-table type="User" :columns="columns" addModalIdentifier="addUser">
+        <template #addButton="{addActions}">
+            <button type="button" class="btn btn-primary" @click="newUser(addActions)">
+                <e-icon name="add"></e-icon>
+                {{$__i('Novo')}}
+            </button>
+        </template>
+
+        <template #status="{item}">
+            {{item.status}}
+        </template>
+
+        <template #alterStatusModalBody="{entityModal}">
+            <h3 class="text-danger">{{$__i('Atenção')}}</h3>
+            {{$__i('Você esta alterando o status do usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong> para <strong class="text-danger">{{entityModal.status}}</strong>. {{$__i('Deseja continuar?')}}
+        </template>
+    </e-table>
+
+    <template #modais="{modal}">
+        <e-modal :title="$__i('Cadastro de usuário')" :entity="entity" identifier="addUser">
+
+            <div class="row">
+                <e-field :entity="entity" prop="name" type="text" :label="$__i('Nome do usuário')"></e-field>
+            </div>
+
+            <div class="row">
+                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4" mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
+                <e-field :entity="entity" prop="email" type="text" :label="$__i('E-mail')" size="4"></e-field>
+                <e-field :entity="entity" prop="username" type="text" :label="$__i('Usuario')" size="4"></e-field>
+            </div>
+
+            <div class="row">
+                <e-field :entity="entity" prop="password" type="password" :label="$__i('Senha')" size="5"></e-field>
+                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')" size="5" required></e-field>
+                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"  :label="$__i('Status')" size="2"></e-field>
+
+            </div>
+
+            <div class="row text-end">
+                <small class="fields-required">* {{$__i('Campos obrigatórios')}} </small>
+            </div>
+
+            <template #actions="{modal}">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
+                <button type="button" class="btn btn-primary" @click="save(modal)">{{$__i('Salvar')}}</button>
+            </template>
+        </e-modal>
+    </template>
 </e-theme>

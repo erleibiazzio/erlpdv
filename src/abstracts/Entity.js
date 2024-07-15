@@ -4,6 +4,11 @@ const McDate = require('../Helpers/McDate').default;
 const Response = require('../Helpers/Response').default;
 
 class Entity extends Model {
+    static STATUS_ACTIVE = 1;
+    static STATUS_INACTIVE = 2;
+    static STATUS_DRAFT = 3;
+    static STATUS_TRASH = -1;
+
     static init(attributes, options) {
         const firstAttributes = {
             id: {
@@ -14,6 +19,12 @@ class Entity extends Model {
         };
 
         const lastAttributes = {
+            statusName: {
+                type: DataTypes.VIRTUAL,
+                get() {
+                    return this.statusById(this.getDataValue('status'));
+                },
+            },
             createdAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
@@ -104,6 +115,90 @@ class Entity extends Model {
             throw new Error(`Erro ao popular a entidade: ${error.message}`);
         }
     }
+
+    statusById(status) {
+        const _status = {
+            [Entity.STATUS_ACTIVE]: 'Ativo',
+            [Entity.STATUS_INACTIVE]: 'Inativo',
+            [Entity.STATUS_DRAFT]: 'Rascunho',
+            [Entity.STATUS_TRASH]: 'Deletado'
+        }
+
+        return _status[status];
+    }
+
+    statusByName(status) {
+        let result = null;
+        switch (status) {
+            case 'Ativo':
+            case 'ativo':
+            case 'enabled':
+            case 'Enabled':
+                result = Entity.STATUS_ACTIVE
+                break;
+            case 'Inativo':
+            case 'inativo':
+            case 'disabled':
+            case 'Disabled':
+                result = Entity.STATUS_INACTIVE
+                break;
+            case 'Rascunho':
+            case 'rascunho':
+            case 'draft':
+            case 'Draft':
+                result = Entity.STATUS_DRAFT
+                break;
+            case 'Deletado':
+            case 'deletado':
+            case 'trash':
+            case 'Trash':
+                result = Entity.STATUS_TRASH
+                break;
+
+            default:
+            result = status;
+                break;
+        }
+
+        return result;
+    }
+
+    statusByNamePt(status) {
+        let result = null;
+        switch (status) {
+            case 'Ativo':
+            case 'ativo':
+            case 'enabled':
+            case 'Enabled':
+                result = this.statusById(Entity.STATUS_ACTIVE)
+                break;
+            case 'Inativo':
+            case 'inativo':
+            case 'disabled':
+            case 'Disabled':
+                result = this.statusById(Entity.STATUS_INACTIVE)
+                break;
+            case 'Rascunho':
+            case 'rascunho':
+            case 'draft':
+            case 'Draft':
+                result = this.statusById(Entity.STATUS_DRAFT)
+                break;
+            case 'Deletado':
+            case 'deletado':
+            case 'trash':
+            case 'Trash':
+                result = this.statusById(Entity.STATUS_TRASH)
+                break;
+
+            default:
+            result = status;
+                break;
+        }
+
+        return result;
+    }
+
 }
 
 module.exports = Entity;

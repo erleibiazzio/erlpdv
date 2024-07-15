@@ -1,22 +1,31 @@
 <div class="e-table">
     <div class="row add">
-        <div class="col-md-1">
-            <button type="button" class="btn btn-primary">
-                <e-icon name="add"></e-icon>
-                {{buttonAddLabel}}
-            </button>
+        <div class="col-md-2">
+            <slot name="addButton" :addActions="{addOpenModal}">
+                <button type="button" class="btn btn-primary" @click="addOpenModal()">
+                    <e-icon name="add"></e-icon>
+                    {{buttonAddLabel}}
+                </button>
+            </slot>
         </div>
     </div>
 
     <div class="row filters">
         <div class="col-md-2">
-            <e-field :entity="filters" prop="filters" type="select" :label="$__i('Registros por página')"
-                :options="maxRecordsOtions"></e-field>
+            <e-field :entity="filters" prop="maxRecords" type="select" :label="$__i('Registros por página')"
+                :options="maxRecordsOtions" @change="this.fetchRecords()"></e-field>
         </div>
 
         <div class="col-md-4">
             <e-field :entity="filters" prop="search" type="text" :label="$__i('Pesquisar')"></e-field>
         </div>
+    </div>
+
+    <div class="row count-ref">
+        <small>
+            {{$__i('Exibindo')}} {{filters.maxRecords > count ? count : filters.maxRecords}} {{$__i('dos')}} {{count}}
+            {{$__i('Registros encontados')}}
+        </small>
     </div>
     <table class="table table-striped table-hover">
         <thead>
@@ -28,10 +37,79 @@
         </thead>
         <tbody>
             <tr v-for="item in records">
-                <template  v-for="column in columns">
-                    <td scope="row">{{getEntityData(item, column.value)}}</td>
+                <template v-for="column in columns">
+                    <td scope="row" v-if="column.slug !== 'actions'">
+                        <slot :name="column.slug" :item="item">
+                            {{getEntityData(item, column.value)}}
+                        </slot>
+                    </td>
+
+                    <td scope="row" v-if="column.slug === 'actions'">
+                        <slot :name="column.slug" :item="item">
+                            <div class="actions">
+                                <a href="#" v-if="actionOptions.includes('edit')"
+                                    @click="alterStatus(item, 'edit')"><e-icon name="edit" color="#caca3a"></e-icon></a>
+                                <a href="#" v-if="actionOptions.includes('locked') && item.status == 1"
+                                    @click="alterStatus(item, 'disabled')"><e-icon name="locked"
+                                        color="red"></e-icon></a>
+                                <a href="#" v-if="actionOptions.includes('unlocked') && item.status == 2"
+                                    @click="alterStatus(item, 'enabled')"><e-icon name="unlocked"
+                                        color="#07c107"></e-icon></a>
+                                <a href="#" v-if="actionOptions.includes('trash')"
+                                    @click="alterStatus(item, 'delete')"><e-icon name="trash" color="red"></e-icon></a>
+                            </div>
+                        </slot>
+                    </td>
                 </template>
             </tr>
         </tbody>
     </table>
+
+    <div class="row">
+        <nav aria-label="..." class="pagination-area">
+            <ul class="pagination">
+                <li class="page-item" v-if="currentPage > 1">
+                    <button class="page-link" @click="goToPage(currentPage - 1)">
+                        <e-icon name="arrow-left"></e-icon>
+                    </button>
+                </li>
+                <li class="page-item" v-for="page in visiblePages" :key="page"
+                    :class="{ 'active': page === currentPage }">
+                    <button class="page-link" @click="goToPage(page)">{{ page }}</button>
+                </li>
+                <li class="page-item" v-if="currentPage < pages">
+                    <button class="page-link" @click="goToPage(currentPage + 1)">
+                        <e-icon name="arrow-right"></e-icon>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="go-to-page" v-if="pages > 1">
+                <input ref="currentPageInput" v-model="currentPage" type="number" class="current form-control"
+                    @change="goToPage($event.target.value)" @input="validatePage($event.target.value)"
+                    @focus="selectValue()">
+            </div>
+        </nav>
+    </div>
 </div>
+
+<!-- Modal iniciado que esta sem definições -->
+<e-modal v-if="addModalIdentifier === 'exampleModal'" :title="$__i('Modal iniciado')" :entity="{}"
+    :identifier="addModalIdentifier"></e-modal>
+
+<e-modal :title="$__i('Alterar status')" :entity="entityModal" identifier="alterStatusModal">
+    <template #default="{entityModal}">
+        <slot name="alterStatusModalBody" :entityModal="entityModal">
+            {{$__i('Você esta alterando o status do registro para')}} <strong>{{entityModal.status}}</strong>.
+            {{$__i('tem certeza que deseja contiduar?')}}
+        </slot>
+    </template>
+
+    <template #actions="{modal}">
+        <slot name="alterStatusModalActions" :modal="modal" :entityModal=entityModal>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
+            <button type="button" class="btn btn-warning"
+                @click="editStatus(entityModal.entity)">{{$__i('Salvar')}}</button>
+        </slot>
+    </template>
+</e-modal>

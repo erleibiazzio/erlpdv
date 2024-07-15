@@ -7,12 +7,34 @@
         display: flex;
         justify-content: space-between;
         margin-top: 60px;
+        margin-bottom: 15px;
+
         label {
             font-weight: normal;
         }
     }
 
+    .count-ref {
+        margin-bottom: 8px;
+    }
+
     table {
         border: solid 1px #e6e5e5;
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
     }
+
+    .pagination-area {
+        display: flex;
+
+        .go-to-page {
+            input {
+                width: 60px;
+            }
+        }
+    }
+   
+
 }

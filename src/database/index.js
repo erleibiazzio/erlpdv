@@ -17,7 +17,7 @@ async function authenticateAndSync() {
     try {
       await sequelize.authenticate();
       console.log('Banco de dados iniciado com sucesso');
-      await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
+      await sequelize.sync(); // Use { force: true } to drop and recreate tables
       console.log('Tabelas sincronizadas');
     } catch (error) {
       console.error('Erro ao conectar ao banco de dados:', error);

@@ -1,0 +1,22 @@
+<!-- Modal -->
+<div class="modal fade" :id="identifier" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div :class="'modal-dialog modal-'+type">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    <slot name="title">{{title}}</slot>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <slot :entityModal="entity">...</slot>
+            </div>
+            <div class="modal-footer">
+                <slot name="actions" :modal="{save}">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
+                    <button type="button" class="btn btn-primary" @click="save()">{{$__i('Salvar')}}</button>
+                </slot>
+            </div>
+        </div>
+    </div>
+</div>

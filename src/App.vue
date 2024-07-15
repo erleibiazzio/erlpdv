@@ -1,6 +1,9 @@
 <template>
+    <div>
+        <e-toast></e-toast>
+    </div>
     <router-view></router-view>
-  </template>
+</template>
 
 <script>
 

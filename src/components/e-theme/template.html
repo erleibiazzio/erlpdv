@@ -1,49 +1,46 @@
-<div v-if="licenceActive" class="container-fluid d-flex flex-column min-vh-100">
-    <div>
-        <!-- Header -->
-        <header class="bg-secondary py-1">
-            <div class="logo">
-                <img src="../../assets/img/logotipo.png">
-            </div>
-
-            <div class="user-actions">
-                <div class="avatar">
-                    <a href="#" @click.prevent="toggleUserAction()">
-                        <e-icon name="avatar" size="32:32"></e-icon>
-                    </a>
-                </div>
-
-                <div class="actions bg-secondary" v-if="showUserAction">
-                    <ul>
-                        <li>{{ $__i('Minha conta') }}</li>
-                        <li><a href="/" @click="logout()">{{ $__i('Sair') }}</a></li>
-                    </ul>
-                </div>
-            </div>
-        </header>
-
-
-
-        <div class="stage row flex-grow-1">
-            <!-- Sidebar -->
-            <aside class="col-md-2 bg-light border-right">
-                <ul class="nav flex-column">
-                    <e-menu route="/" :label="$__i('Principal')" icon="dashboard"></e-menu>
-                    <e-menu route="/users" :label="$__i('Usuarios')" icon="users"></e-menu>
-                </ul>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="col-md-10 p-3">
-                <slot></slot>
-            </main>
+<div v-if="licenceActive" class="container-fluid d-flex flex-column min-vh-100 vh-100">
+    <!-- Header -->
+    <header class="bg-secondary py-1">
+        <div class="logo">
+            <img src="../../assets/img/logotipo.png">
         </div>
 
-        <!-- Footer -->
-        <footer class="bg-secondary text-white text-center py-2">
-            &copy; {{currentYear}} {{info.organization}} - {{version}}
-        </footer>
+        <div class="user-actions">
+            <div class="avatar">
+                <a href="#" @click.prevent="toggleUserAction()">
+                    <e-icon name="avatar" size="32:32"></e-icon>
+                </a>
+            </div>
+
+            <div class="actions bg-secondary" v-if="showUserAction">
+                <ul>
+                    <li>{{ $__i('Minha conta') }}</li>
+                    <li><a href="/" @click="logout()">{{ $__i('Sair') }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="stage row flex-grow-1">
+        <!-- Sidebar -->
+        <aside class="col-md-2 bg-light border-right">
+            <ul class="nav flex-column">
+                <e-menu route="/" :label="$__i('Principal')" icon="dashboard"></e-menu>
+                <e-menu route="/users" :label="$__i('Usuarios')" icon="users"></e-menu>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-md-10 p-3">
+            <slot></slot>
+            <slot name="modais"></slot>
+        </main>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-secondary text-white text-center py-2">
+        &copy; {{currentYear}} {{info.organization}} - {{version}}
+    </footer>
 </div>
 
 <!-- Exibe a mensagem de licença expirada ou desativada -->

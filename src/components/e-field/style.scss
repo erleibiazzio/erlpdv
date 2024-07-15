@@ -1,0 +1,13 @@
+.e-field {
+    .label {
+        display: flex;
+        gap: 5px;
+    }
+    .errors {
+        color: red;
+    }
+
+    & .field-error {
+       border-color: red;     
+    }
+}

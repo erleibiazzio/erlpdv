@@ -10,6 +10,10 @@ export default {
         size: {
             type: String,
             default: "24:24"
+        },
+        color: {
+            type: String,
+            default: '#000'
         }
     },
     data() {

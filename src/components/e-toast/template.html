@@ -1,0 +1,6 @@
+<div ref="toast" class="speed-toast">
+    <div  :class="'alert '+options.type" role="alert">
+        <e-icon v-if="options.icon" :name="options.icon"></e-icon>
+        {{options.message}}
+    </div>
+</div>

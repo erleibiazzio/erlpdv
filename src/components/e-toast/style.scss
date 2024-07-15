@@ -1,0 +1,36 @@
+.speed-toast {
+    display: none;
+    position: fixed;
+    top: 12%;
+    right: 2%;
+    transform: translateY(-50%);
+    width: 500px;
+    z-index: 10000;
+
+    &.active {
+        display: block;
+
+      
+    }
+
+    .alert {
+        color: #ffff;
+
+        &.danger {
+            background-color: red;
+        }
+
+        &.success {
+            background-color: green
+        }
+
+        &.warning {
+            background-color: rgb(219, 219, 5);
+            color: black
+        }
+        
+        &.secondary {
+            background-color: #5e5d5d;
+        }
+    }
+}

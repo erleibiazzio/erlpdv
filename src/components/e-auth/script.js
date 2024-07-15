@@ -1,6 +1,6 @@
 const Response = require('../../Helpers/Response').default;
 import User from '../../models/User';
-import Utils from '../../Helpers/Utils';
+import { verifyPassword } from '../../Helpers/Utils';
 const { createSession } = require('../../session');
 
 export default {
@@ -22,7 +22,7 @@ export default {
 
             try {
                 let user = await User.findBy({ username: this.entity.username });
-                if (user && await Utils.verifyPassword(this.entity.password, user.password)) {
+                if (user && await verifyPassword(this.entity.password, user.password)) {
                     const sessionId = await createSession(user.id);
                     this.setResponse('success', this.$__i('Login efetuado com sucesso'));
                     localStorage.setItem('sessionId', sessionId);

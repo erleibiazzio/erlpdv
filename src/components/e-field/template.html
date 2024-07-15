@@ -1,13 +1,34 @@
-<div v-if="is('text')" class="form-group">
-    <label for="username">{{label}}</label>
-    <input :type="type" id="username" v-model="entity[prop]" :placeholder="placeholder" class="form-control">
-</div>
+<div :class="'e-field mb-3 col-md-'+size">
+    <div class="label">
+        <small class="fields-required" v-if="isRequired()">*</small>
+        <label :for="fieldId">{{label}}</label>
+    </div>
+    <div v-if="is('text')" class="form-group">
+        <input :type="type" :id="fieldId" v-model="entity[prop]" :placeholder="placeholder" class="form-control"
+            :class="{'field-error': hasError()}">
+    </div>
 
-<div v-if="is('select')" class="form-group">
-    <label for="username">{{label}}</label>
-    <select class="form-select">
-        <template v-for="item in options">
+    <div v-if="is('fieldMask')" class="form-group">
+        <input :type="type" :id="fieldId" v-model="entity[prop]" :placeholder="placeholder" class="form-control" v-maska
+            :data-maska="mask" :class="{'field-error': hasError()}">
+    </div>
+
+    <div v-if="is('password')" class="form-group">
+        <input :type="type" :id="fieldId" v-model="entity[prop]" :placeholder="placeholder" class="form-control"
+            :class="{'field-error': hasError()}">
+    </div>
+
+    <div v-if="is('select')" class="form-group">
+        <select v-model="entity[prop]" class="form-select" :class="{'field-error': hasError()}" @change="change($event)">
+            <template v-for="item in options">
                 <option :value="item.value">{{item.label}}</option>
-        </template>
-    </select>
+            </template>
+        </select>
+    </div>
+
+    <div class="errors">
+        <small>
+            {{errors[prop]}}
+        </small>
+    </div>
 </div>

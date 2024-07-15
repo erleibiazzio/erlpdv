@@ -39,6 +39,14 @@ class Licence extends Entity {
 }
 
 Licence.init({
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    document: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     organization: {
         type: DataTypes.STRING,
         allowNull: false,
