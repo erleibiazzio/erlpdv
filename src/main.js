@@ -1,40 +1,28 @@
-// src/main.js
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './App.vue';
 import { Icon } from '@iconify/vue';
-import { vMaska } from "maska/vue"
-
-import API from './Helpers/API'; // Importe a classe API
-
-// Importando Bootstrap CSS e JavaScript
+import { vMaska } from "maska/vue";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 import router from './router';
-
-// Importação de classes Helpers Globais
-const { __i } = require('./Helpers/Utils');
-
-// Importando o arquivo global de estilos SCSS
+const { __i, openModal } = require('./Helpers/Utils');
 import './assets/sass/global.scss';
-
-// Importando entidades
 import Licence from './models/Licence';
+import API from './Helpers/API';
+import { useAuthStore } from './stores/auth';
 
-// Criando a aplicação Vue
 const app = createApp(App);
+const pinia = createPinia();
 
-// Registrando entidades de forma global
+// Configurações globais
 app.config.globalProperties.$Licence = Licence;
 app.config.globalProperties.$__i = __i;
-
-const api = new API();
-app.config.globalProperties.$api = api;
-
-// Registrando valores de forma global
+app.config.globalProperties.$openModal = openModal;
+app.config.globalProperties.$api = new API();
 app.config.globalProperties.$licenceActive = await Licence.isActive();
 
-// Importando componentes
+// Registrando componentes globais
 import EAlert from './components/e-alert/ErIndex.vue';
 import EBreadcrumb from './components/e-breadcrumb/ErIndex.vue';
 import ECard from './components/e-card/ErIndex.vue';
@@ -47,11 +35,8 @@ import EModal from './components/e-modal/ErIndex.vue';
 import ETable from './components/e-table/ErIndex.vue';
 import EToast from './components/e-toast/ErIndex.vue';
 
-
 app.component('VIconify', Icon);
 app.directive('maska', vMaska);
-
-
 app.component('e-alert', EAlert);
 app.component('e-breadcrumb', EBreadcrumb);
 app.component('e-card', ECard);
@@ -64,8 +49,15 @@ app.component('e-modal', EModal);
 app.component('e-table', ETable);
 app.component('e-toast', EToast);
 
-// roteador
+// Uso do roteador e Pinia na aplicação Vue
 app.use(router);
+app.use(pinia); // Importante: configurar o Pinia antes de usar qualquer store
+
+// Criando a instância da store de autenticação
+const authStore = useAuthStore();
+
+// Registrando a store de autenticação globalmente
+app.config.globalProperties.$authStore = authStore;
 
 // Montando a aplicação Vue no elemento com id 'app' no HTML
 app.mount('#app');

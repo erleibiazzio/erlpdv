@@ -1,12 +1,15 @@
 
 import { loadModel } from '../../Helpers/loadModels';
-const { Sequelize } = require('sequelize');
-import { Modal } from 'bootstrap'; // Importa Modal do Bootstrap
+const { Op } = require('sequelize');
 import { showToast } from '../../Helpers/Utils';
 
 
 export default {
     name: 'e-table',
+    async mounted() {
+        window.addEventListener("tableRefresh", this.fetchRecords);
+        await this.fetchRecords();
+    },
     props: {
         type: {
             type: [Boolean, String],
@@ -30,7 +33,7 @@ export default {
         },
         actionOptions: {
             type: Array,
-            default:['edit', 'trash', 'locked', 'unlocked']
+            default: ['edit', 'trash', 'locked', 'unlocked']
         },
     },
     data() {
@@ -77,21 +80,18 @@ export default {
             return pages;
         }
     },
-    async mounted() {
-        await this.fetchRecords();
-    },
     methods: {
         async pagination(model) {
             this.count = await model.count({
                 where: {
-                    status: { [Sequelize.Op.gte]: 1 }
+                    status: { [Op.gte]: 1 }
                 }
             });
 
             this.pages = Math.ceil(this.count / this.filters.maxRecords);
         },
         getEntityData(obj, value) {
-            if(value) {
+            if (value) {
                 let val = eval(`obj.${value}`);
                 return val;
             }
@@ -104,7 +104,7 @@ export default {
 
                     let offset = (this.currentPage - 1) * this.filters.maxRecords
 
-                    const records = await model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset });
+                    const records = await model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
                     this.records = records.map(record => record.get({ plain: true }));
                     if (records.length > 0) {
                         this.headers = Object.keys(records[0].get({ plain: true }));
@@ -113,7 +113,6 @@ export default {
                     this.records = this.entities
                 }
             } catch (error) {
-                console.log(error.erros)
                 console.error('Failed to fetch records:', error);
             }
         },
@@ -143,47 +142,56 @@ export default {
             this.currentPage = page;
 
             this.$nextTick(() => {
-                // Seleciona o valor do input após a atualização
                 const inputElement = this.$refs.currentPageInput;
-                inputElement.select(); // Seleciona o texto no input
+                inputElement.select(); 
             });
 
             this.goToPage(page);
         },
         selectValue() {
             const inputElement = this.$refs.currentPageInput;
-            inputElement.select(); // Seleciona o texto no input quando ele recebe foco
-        },
-        addOpenModal() {
-           const modal = document.getElementById(this.addModalIdentifier);
-           const modalInstance = new Modal(modal);
-           modalInstance.show()
+            inputElement.select(); 
         },
         async alterStatus(item, status) {
             const model = await loadModel(this.type);
-            let entity = await model.findOne({where: {id: item.id}});
-            entity.status = entity.statusByName(status);
+            let entity = await model.findOne({ where: { id: item.id } });
 
+            entity.status = parseInt(entity.statusByName(status));
+            
             this.entityModal = {
                 entity: entity,
-                status: entity.statusByNamePt(status)
+                status: entity.statusIdByName(status)
             };
 
-            const modal = document.getElementById('alterStatusModal');
-            this.modalInstance = new Modal(modal);
-            this.modalInstance.show()
+            this.modalInstance = this.$openModal('alterStatusModal');
         },
-        async editStatus(entity) {
+        async editStatus() {
             try {
-                await entity.save();
+                await this.entityModal.entity.save();
                 await this.fetchRecords();
                 showToast('Status alterado com sucesso');
-
                 this.modalInstance.hide();
-
             } catch (error) {
-                throw new Error('A senha e a confirmação de senha devem ser iguais');
+                throw new Error(error);
             }
+        },
+        async deleteEntity(item) {
+            const model = await loadModel(this.type);
+            let entity = await model.findOne({ where: { id: item.id } });
+            entity.status = entity.statusByName('trash');
+
+            this.entityModal = {
+                entity: entity
+            };
+
+            this.modalInstance = this.$openModal('deleteModal');
+        },
+        async deleteRecord(entity) {
+            await entity.save();
+            await this.fetchRecords();
+            showToast('Registro deletado com sucesso');
+
+            this.modalInstance.hide();
         }
     },
 };

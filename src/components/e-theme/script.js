@@ -12,6 +12,7 @@ export default {
     methods: {
         async logout() {
             let sessionStorage = localStorage.getItem('sessionId');
+            this.$authStore.logout();
             await destroySession(sessionStorage);
         },
         toggleUserAction() {

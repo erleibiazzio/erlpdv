@@ -1,12 +1,12 @@
 <div class="e-table">
     <div class="row add">
         <div class="col-md-2">
-            <slot name="addButton" :addActions="{addOpenModal}">
-                <button type="button" class="btn btn-primary" @click="addOpenModal()">
-                    <e-icon name="add"></e-icon>
-                    {{buttonAddLabel}}
-                </button>
-            </slot>
+           <slot name="addButton">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#'+addModalIdentifier">
+                <e-icon name="add" color="#fff"></e-icon>
+                {{buttonAddLabel}}
+            </button>
+           </slot>
         </div>
     </div>
 
@@ -47,16 +47,18 @@
                     <td scope="row" v-if="column.slug === 'actions'">
                         <slot :name="column.slug" :item="item">
                             <div class="actions">
-                                <a href="#" v-if="actionOptions.includes('edit')"
-                                    @click="alterStatus(item, 'edit')"><e-icon name="edit" color="#caca3a"></e-icon></a>
-                                <a href="#" v-if="actionOptions.includes('locked') && item.status == 1"
-                                    @click="alterStatus(item, 'disabled')"><e-icon name="locked"
-                                        color="red"></e-icon></a>
-                                <a href="#" v-if="actionOptions.includes('unlocked') && item.status == 2"
-                                    @click="alterStatus(item, 'enabled')"><e-icon name="unlocked"
-                                        color="#07c107"></e-icon></a>
-                                <a href="#" v-if="actionOptions.includes('trash')"
-                                    @click="alterStatus(item, 'delete')"><e-icon name="trash" color="red"></e-icon></a>
+                                <a href="#" v-if="actionOptions.includes('edit')">
+                                    <e-icon name="edit" color="#caca3a"></e-icon>
+                                </a>
+                                <a href="#" v-if="actionOptions.includes('locked') && item.status == 1" @click="alterStatus(item, 'disabled')">
+                                    <e-icon name="locked" color="red"></e-icon>
+                                </a>
+                                <a href="#" v-if="actionOptions.includes('unlocked') && item.status == 2" @click="alterStatus(item, 'enabled')">
+                                    <e-icon name="unlocked" color="#07c107"></e-icon>
+                                </a>
+                                <a href="#" v-if="actionOptions.includes('trash')"  @click="deleteEntity(item)">
+                                    <e-icon name="trash" color="red"></e-icon>
+                                </a>
                             </div>
                         </slot>
                     </td>
@@ -100,16 +102,30 @@
 <e-modal :title="$__i('Alterar status')" :entity="entityModal" identifier="alterStatusModal">
     <template #default="{entityModal}">
         <slot name="alterStatusModalBody" :entityModal="entityModal">
-            {{$__i('Você esta alterando o status do registro para')}} <strong>{{entityModal.status}}</strong>.
-            {{$__i('tem certeza que deseja contiduar?')}}
+            {{$__i('Você esta alterando o status do registro para')}} <strong>{{entityModal.status}}</strong>. {{$__i('tem certeza que deseja contiduar?')}}
         </slot>
     </template>
 
     <template #actions="{modal}">
         <slot name="alterStatusModalActions" :modal="modal" :entityModal=entityModal>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
-            <button type="button" class="btn btn-warning"
-                @click="editStatus(entityModal.entity)">{{$__i('Salvar')}}</button>
+            <button type="button" class="btn btn-warning" @click="editStatus()">{{$__i('Salvar')}}</button>
+        </slot>
+    </template>
+</e-modal>
+
+<e-modal :title="$__i('Deletar registro')" :entity="entityModal" identifier="deleteModal">
+    <template #default="{entityModal}">
+        <slot name="deleteModalBody" :entityModal="entityModal">
+            {{$__i('Você esta deletando o registro')}} <strong>#{{entityModal.entity?.id}}</strong>. {{$__i('tem certeza que deseja contiduar?')}}
+        </slot>
+    </template>
+
+    <template #actions="{modal}">
+        <slot name="deleteModalActions" :modal="modal" :entityModal=entityModal>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
+            <button type="button" class="btn btn-danger"
+                @click="deleteRecord(entityModal.entity)">{{$__i('Deletar')}}</button>
         </slot>
     </template>
 </e-modal>

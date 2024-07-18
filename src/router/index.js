@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Licence from '../models/Licence';
 import { getSession } from '../session';
+import User from '../models/User';
 
 
 // Importe seus componentes e configure suas rotas
@@ -61,10 +62,24 @@ router.beforeEach(async (to, from, next) => {
 async function checkAuthentication() {
     let sessionStorage = localStorage.getItem('sessionId');
     if (sessionStorage) {
-        let session = await getSession(sessionStorage)
-        if (session && session.sessionId == sessionStorage) {
-            return true;
+        let session = await getSession(sessionStorage);
+        if(session) {
+            let user = await User.findByPk(session.userId);
+
+            if(!user) {
+                return false;
+            }
+    
+            if(user.status != 1) {
+                session.destroy()
+                return false;
+            }
+    
+            if (session.sessionId == sessionStorage) {
+                return true;
+            }
         }
+       
     }
 
     return false;

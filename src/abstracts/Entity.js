@@ -3,12 +3,23 @@ const { Model, DataTypes } = require('sequelize');
 const McDate = require('../Helpers/McDate').default;
 const Response = require('../Helpers/Response').default;
 
+/**
+ * Classe base para entidades utilizando Sequelize.
+ * Esta classe define métodos comuns para manipulação de entidades
+ * e atributos comuns como id, createdAt e updatedAt.
+ */
 class Entity extends Model {
     static STATUS_ACTIVE = 1;
     static STATUS_INACTIVE = 2;
     static STATUS_DRAFT = 3;
     static STATUS_TRASH = -1;
 
+    /**
+     * Inicializa a classe Entity com os atributos fornecidos.
+     * @param {Object} attributes - Atributos adicionais para serem inicializados.
+     * @param {Object} options - Opções adicionais para a inicialização do modelo.
+     * @returns {Model} - Retorna o modelo Sequelize inicializado.
+     */
     static init(attributes, options) {
         const firstAttributes = {
             id: {
@@ -52,41 +63,43 @@ class Entity extends Model {
         };
 
         options = options || {};
-        options.timestamps = true; // Adding common option for timestamps
+        options.timestamps = true; // Adiciona opção comum para timestamps
         return super.init(allAttributes, options);
     }
 
     /**
-     * Devolve todas as entidades
-     * @returns Entity[]
+     * Retorna todas as entidades do banco de dados.
+     * @returns {Entity[]} - Um array de entidades.
+     * @throws {Error} - Lança um erro se não conseguir buscar as entidades.
      */
     static async find() {
         try {
             const entities = await this.findAll();
             return entities;
         } catch (error) {
-            throw new Error(`Failed to fetch entities: ${error.message}`);
+            throw new Error(`Falha ao buscar entidades: ${error.message}`);
         }
     }
 
     /**
-     * Devolve todas as entidades com base nos filtros
-     * @param {*} filter 
-     * @returns Entity[]
+     * Retorna uma entidade baseada nos filtros fornecidos.
+     * @param {*} filter - Filtros para encontrar a entidade desejada.
+     * @returns {Entity|null} - A entidade encontrada ou null se não encontrada.
+     * @throws {Error} - Lança um erro se não conseguir buscar a entidade.
      */
     static async findBy(filter) {
         try {
             const entity = await this.findOne({ where: filter });
             return entity;
         } catch (error) {
-            throw new Error(`Failed to fetch entity: ${error.message}`);
+            throw new Error(`Falha ao buscar entidade: ${error.message}`);
         }
     }
 
     /**
-     * Atualiza a entidade com os dados fornecidos
-     * @param {Object} data 
-     * @returns Entity
+     * Atualiza a entidade com os dados fornecidos.
+     * @param {Object} data - Dados para atualizar na entidade.
+     * @returns {Object} - Objeto de resposta indicando sucesso ou falha na atualização.
      */
     async update(data) {
         let response;
@@ -97,14 +110,15 @@ class Entity extends Model {
             response = new Response('success', 'Dados atualizados com sucesso', { entity: this });
             return response.render();
         } catch (error) {
-            response = new Response('error', 'Não foi possivel atualizar os dados', { entity: this });
+            response = new Response('error', 'Não foi possível atualizar os dados', { entity: this });
             return response.render();
         }
     }
 
     /**
-     * Faz a população da entidade
-     * @param { object } data 
+     * Preenche a entidade com os dados fornecidos.
+     * @param {Object} data - Dados para preencher na entidade.
+     * @throws {Error} - Lança um erro se ocorrer um problema ao preencher a entidade.
      */
     async populate(data) {
         try {
@@ -116,17 +130,27 @@ class Entity extends Model {
         }
     }
 
+    /**
+     * Retorna o nome do status baseado no ID do status.
+     * @param {int} status - ID do status.
+     * @returns {String} - Nome do status em texto pt_BR.
+     */
     statusById(status) {
         const _status = {
             [Entity.STATUS_ACTIVE]: 'Ativo',
             [Entity.STATUS_INACTIVE]: 'Inativo',
             [Entity.STATUS_DRAFT]: 'Rascunho',
             [Entity.STATUS_TRASH]: 'Deletado'
-        }
+        };
 
         return _status[status];
     }
 
+    /**
+     * Retorna o ID do status baseado no nome do status.
+     * @param {String} status - Nome do status.
+     * @returns {int|null} - ID do status correspondente ou null se não encontrado.
+     */
     statusByName(status) {
         let result = null;
         switch (status) {
@@ -156,14 +180,19 @@ class Entity extends Model {
                 break;
 
             default:
-            result = status;
+                result = status;
                 break;
         }
 
         return result;
     }
 
-    statusByNamePt(status) {
+    /**
+     * Retorna o Nome do status baseado no nome em ingles ou portugues do status.
+     * @param {String} status - Nome do status.
+     * @returns {int|null} - ID do status correspondente ou null se não encontrado.
+     */
+    statusIdByName(status) {
         let result = null;
         switch (status) {
             case 'Ativo':
@@ -192,11 +221,30 @@ class Entity extends Model {
                 break;
 
             default:
-            result = status;
+                result = status;
                 break;
         }
 
         return result;
+    }
+
+    static async save() {
+        try {
+            await this.validate();
+            await this.save();
+            window.dispatchEvent(new CustomEvent('saveSuccess', { detail: { errors: this } }));
+            return {
+                error: false,
+                data: this
+            }
+    
+        } catch (error) {
+            window.dispatchEvent(new CustomEvent('saveErrors', { detail: { errors: error.errors } }));
+            return {
+                error: true,
+                data: error.errors
+            }
+        }
     }
 
 }

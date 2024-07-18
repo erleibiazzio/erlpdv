@@ -3,6 +3,7 @@ const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../database');
 const Entity = require('../abstracts/Entity');
 const { validateCPF, validateCNPJ } = require('../Helpers/validators');
+const { verifyPassword } = require('../Helpers/Utils');
 
 class User extends Entity {
     // Defina atributos específicos do modelo User, se necessário
@@ -52,6 +53,9 @@ User.init({
                 }
             }
         },
+        set(value) {
+            this.setDataValue('document', value.replace(/\D/g, ''))
+        }
     },
     username: {
         type: DataTypes.STRING,
@@ -88,17 +92,34 @@ User.init({
         allowNull: false,
         validate: {
             notNull: {
-                msg: 'A senha é obrigatória'
+                msg: 'A senha é obrigatória A'
             },
             notEmpty: {
-                msg: 'A senha é obrigatória'
+                msg: 'A senha é obrigatória B'
             },
+        },
+    },
+    repassword: {
+        type: DataTypes.VIRTUAL,
+        allowNull: false,
+        validate: {
+            notNull: {
+                msg: 'A confirmação de senha é obrigatória A'
+            },
+            notEmpty: {
+                msg: 'A confirmação de senha é obrigatória B'
+            },
+            async isValid() {
+                if (!await verifyPassword(this.repassword, this.password)) {
+                    throw new Error('A senha e a confirmação de senha devem ser iguais');
+                }
+            }
         }
     },
     status: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 1,
+        defaultValue: Entity.STATUS_ACTIVE,
     },
     owner: {
         type: DataTypes.INTEGER,
@@ -109,23 +130,7 @@ User.init({
         allowNull: false,
         defaultValue: 'user',
     },
-    repassword: {
-        type: DataTypes.VIRTUAL,
-        allowNull: false,
-        validate: {
-            notNull: {
-                msg: 'A confirmação de senha é obrigatória'
-            },
-            notEmpty: {
-                msg: 'A confirmação de senha é obrigatória'
-            },
-            isValid() {
-                if (this.password != this.repassword) {
-                    throw new Error('A senha e a confirmação de senha devem ser iguais');
-                }
-            }
-        },
-    },
+   
 }, {
     sequelize,
     modelName: 'User',

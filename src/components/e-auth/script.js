@@ -22,17 +22,32 @@ export default {
 
             try {
                 let user = await User.findBy({ username: this.entity.username });
-                if (user && await verifyPassword(this.entity.password, user.password)) {
-                    const sessionId = await createSession(user.id);
-                    this.setResponse('success', this.$__i('Login efetuado com sucesso'));
-                    localStorage.setItem('sessionId', sessionId);
 
-                    setTimeout(() => {
-                        this.$router.push('/');
-                    }, 1500);
-                } else {
-                    this.setResponse('danger', this.$__i('Usuário ou senha inválido'));
+                if (user) {
+                    if (user.status != 1) {
+                        this.setResponse('danger', this.$__i('Acesso desativado fale com administrador'));
+                    } else {
+                        if (await verifyPassword(this.entity.password, user.password)) {
+                            const sessionId = await createSession(user.id);
+                            this.setResponse('success', this.$__i('Login efetuado com sucesso'));
+                            localStorage.setItem('sessionId', sessionId);
+                            this.$authStore.login({
+                                user: user,
+                                sessionId: sessionId
+                            })
+
+                            setTimeout(() => {
+                                this.$router.push('/');
+                            }, 1500);
+                        } else {
+                            this.setResponse('danger', this.$__i('Usuário ou senha inválido'));
+                        }
+                    }
                 }
+
+
+
+
             } catch (error) {
                 this.setResponse('danger', this.$__i('Ocorreu um erro ao tentar fazer login'));
                 console.error(error);

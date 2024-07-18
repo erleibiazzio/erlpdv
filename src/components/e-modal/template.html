@@ -12,9 +12,9 @@
                 <slot :entityModal="entity">...</slot>
             </div>
             <div class="modal-footer">
-                <slot name="actions" :modal="{save}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
-                    <button type="button" class="btn btn-primary" @click="save()">{{$__i('Salvar')}}</button>
+                <slot name="actions">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
+                    <button type="button" class="btn btn-primary">{{$__i('Salvar')}}</button>
                 </slot>
             </div>
         </div>

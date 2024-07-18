@@ -2,8 +2,8 @@
     <e-breadcrumb :label="$__i('Usuários')" icon="users" :navigation="breadcrumb"></e-breadcrumb>
     <e-table type="User" :columns="columns" addModalIdentifier="addUser">
         <template #addButton="{addActions}">
-            <button type="button" class="btn btn-primary" @click="newUser(addActions)">
-                <e-icon name="add"></e-icon>
+            <button type="button" class="btn btn-primary" @click="newUser()">
+                <e-icon name="add" color="#fff"></e-icon>
                 {{$__i('Novo')}}
             </button>
         </template>
@@ -15,6 +15,11 @@
         <template #alterStatusModalBody="{entityModal}">
             <h3 class="text-danger">{{$__i('Atenção')}}</h3>
             {{$__i('Você esta alterando o status do usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong> para <strong class="text-danger">{{entityModal.status}}</strong>. {{$__i('Deseja continuar?')}}
+        </template>
+
+        <template #deleteModalBody="{entityModal}">
+            <h3 class="text-danger">{{$__i('Atenção')}}</h3>
+            {{$__i('Você esta deletando o usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong>. {{$__i('Deseja continuar?')}}
         </template>
     </e-table>
 

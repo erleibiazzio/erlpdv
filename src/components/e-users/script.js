@@ -1,14 +1,18 @@
 
 import { loadModel } from '../../Helpers/loadModels';
-import { showToast } from '../../Helpers/Utils';
+import { showToast, dispatchEvent, encryptPassword } from '../../Helpers/Utils';
 
 export default {
     name: 'e-dashboard',
     async mounted() {
         this.organization = await this.$Licence.getLicence();
+        this.entity.slug = "user"
+        this.entity.owner = this.organization.id
+        this.entity.status = 1
     },
     data() {
         return {
+            modalInstance: {},
             response: {},
             errors: {},
             organization: {},
@@ -38,22 +42,27 @@ export default {
         }
     },
     methods: {
-        async newUser(addActions) {
-            const model = await loadModel('User');
-            this.entity = new model();
-            this.entity.owner = this.organization.id
-            this.entity.status = 1
-            addActions.addOpenModal();
+        async newUser() {
+            this.modalInstance = this.$openModal('addUser');
         },
-        async save(modal) {
-            this.response = await modal.save();
+        async save() {
+            try {
+                const model = await loadModel('User');
+                let entity = new model();
+                
+                await entity.populate(this.entity);
+                entity.password = await encryptPassword(this.entity.password);
+                await entity.save();
 
-            if (!this.response.error) {
+                this.modalInstance.hide();
+                dispatchEvent('saveSuccess', { entity: entity });
+                dispatchEvent('tableRefresh');
                 showToast(this.$__i('Usuario cadastrado com sucesso'), 'success');
                 this.entity = {}
-            } else {
+
+            } catch (error) {
                 showToast(this.$__i('Corrija os erros para continuar'), 'error');
-                this.errors = this.response.data;
+                dispatchEvent('saveErrors', { errors: error.errors });
             }
         }
     },
