@@ -228,6 +228,16 @@ class Entity extends Model {
         return result;
     }
 
+    async populateDiff(newEntity) {
+        for (const key in newEntity) {
+            if (this[key] !== newEntity[key]) {
+                this[key] = newEntity[key];
+            }
+        }
+
+        return this;
+    }
+
     static async save() {
         try {
             await this.validate();

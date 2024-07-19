@@ -21,6 +21,12 @@
             <h3 class="text-danger">{{$__i('Atenção')}}</h3>
             {{$__i('Você esta deletando o usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong>. {{$__i('Deseja continuar?')}}
         </template>
+
+        <template #tableEdit="{table}">
+            <a href="#" @click="startEdit(table.item)">
+                <e-icon name="edit" color="#caca3a"></e-icon>
+            </a>
+        </template>
     </e-table>
 
     <template #modais="{modal}">
@@ -50,6 +56,34 @@
             <template #actions="{modal}">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
                 <button type="button" class="btn btn-primary" @click="save(modal)">{{$__i('Salvar')}}</button>
+            </template>
+        </e-modal>
+
+        <e-modal :title="$__i('Editar de usuário')" :entity="entity" identifier="editUser">
+            <div class="row">
+                <e-field :entity="entity" prop="name" type="text" :label="$__i('Nome do usuário')"></e-field>
+            </div>
+
+            <div class="row">
+                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4" mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
+                <e-field :entity="entity" prop="email" type="text" :label="$__i('E-mail')" size="4"></e-field>
+                <e-field :entity="entity" prop="username" type="text" :label="$__i('Usuario')" size="4"></e-field>
+            </div>
+
+            <div class="row">
+                <e-field :entity="entity" prop="password" type="password" :label="$__i('Senha')" size="5"></e-field>
+                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')" size="5" required></e-field>
+                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"  :label="$__i('Status')" size="2"></e-field>
+
+            </div>
+
+            <div class="row text-end">
+                <small class="fields-required">* {{$__i('Campos obrigatórios')}} </small>
+            </div>
+
+            <template #actions="{modal}">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
+                <button type="button" class="btn btn-warning" @click="edit()">{{$__i('Editar')}}</button>
             </template>
         </e-modal>
     </template>

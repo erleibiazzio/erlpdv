@@ -3,23 +3,29 @@ const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../database');
 const Entity = require('../abstracts/Entity');
 const { validateCPF, validateCNPJ } = require('../Helpers/validators');
-const { verifyPassword } = require('../Helpers/Utils');
+const { encryptPassword } = require('../Helpers/Utils');
 
 class User extends Entity {
     // Defina atributos específicos do modelo User, se necessário
 }
 
+// Função para verificar unicidade de campos
 async function checkUniqueField(fieldName, value, user, errorMessages) {
-    const existingUser = await User.findOne({ where: { [fieldName]: value } });
-    if (existingUser && existingUser.id !== user.id) {
-        const validationError = new Sequelize.ValidationError();
-        validationError.errors.push(new Sequelize.ValidationErrorItem(
-            errorMessages[fieldName],
-            'unique violation',
-            fieldName,
-            value
-        ));
-        throw validationError;
+    // eslint-disable-next-line no-useless-catch
+    try {
+        const existingUser = await User.findOne({ where: { [fieldName]: value } });
+        if (existingUser && existingUser.id !== user.id) {
+            throw new Sequelize.ValidationError(null, [
+                new Sequelize.ValidationErrorItem(
+                    errorMessages[fieldName],
+                    'unique violation',
+                    fieldName,
+                    value
+                )
+            ]);
+        }
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -54,13 +60,16 @@ User.init({
             }
         },
         set(value) {
-            this.setDataValue('document', value.replace(/\D/g, ''))
+            this.setDataValue('document', value.replace(/\D/g, ''));
         }
     },
     username: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: {
+            args: true,
+            msg: 'Este nome de usuário já está em uso, por favor, escolha outro.'
+        },
         validate: {
             notNull: {
                 msg: 'O usuário é obrigatório'
@@ -69,12 +78,14 @@ User.init({
                 msg: 'O usuário é obrigatório'
             },
         }
-
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: {
+            args: true,
+            msg: 'Este e-mail já está sendo utilizado por outro usuário, por favor, escolha outro.'
+        },
         validate: {
             notNull: {
                 msg: 'O e-mail é obrigatório'
@@ -83,7 +94,7 @@ User.init({
                 msg: 'O e-mail é obrigatório'
             },
             isEmail: {
-                msg: 'O e-mail informado é invalido'
+                msg: 'O e-mail informado é inválido'
             }
         }
     },
@@ -92,10 +103,10 @@ User.init({
         allowNull: false,
         validate: {
             notNull: {
-                msg: 'A senha é obrigatória A'
+                msg: 'A senha é obrigatória'
             },
             notEmpty: {
-                msg: 'A senha é obrigatória B'
+                msg: 'A senha é obrigatória'
             },
         },
     },
@@ -104,13 +115,13 @@ User.init({
         allowNull: false,
         validate: {
             notNull: {
-                msg: 'A confirmação de senha é obrigatória A'
+                msg: 'A confirmação de senha é obrigatória'
             },
             notEmpty: {
-                msg: 'A confirmação de senha é obrigatória B'
+                msg: 'A confirmação de senha é obrigatória'
             },
             async isValid() {
-                if (!await verifyPassword(this.repassword, this.password)) {
+                if (this.repassword !== this.password) {
                     throw new Error('A senha e a confirmação de senha devem ser iguais');
                 }
             }
@@ -129,8 +140,7 @@ User.init({
         type: DataTypes.VIRTUAL,
         allowNull: false,
         defaultValue: 'user',
-    },
-   
+    }
 }, {
     sequelize,
     modelName: 'User',
@@ -142,11 +152,18 @@ User.init({
                 username: 'Este nome de usuário já está em uso, por favor, escolha outro.',
             };
 
-            await checkUniqueField('document', user.document, user, errorMessages);
-            await checkUniqueField('email', user.email, user, errorMessages);
-            await checkUniqueField('username', user.username, user, errorMessages);
+            await Promise.all([
+                checkUniqueField('document', user.document, user, errorMessages),
+                checkUniqueField('email', user.email, user, errorMessages),
+                checkUniqueField('username', user.username, user, errorMessages),
+            ]);
+        },
+        beforeSave: async (user) => {
+            if (user.password) {
+                user.password = await encryptPassword(user.password);
+            }
         }
-    },
+    }
 });
 
 module.exports = User;

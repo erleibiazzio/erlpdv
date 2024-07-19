@@ -1,17 +1,15 @@
 
 import { loadModel } from '../../Helpers/loadModels';
-import { showToast, dispatchEvent, encryptPassword } from '../../Helpers/Utils';
+import { showToast, dispatchEvent } from '../../Helpers/Utils';
 
 export default {
     name: 'e-dashboard',
     async mounted() {
         this.organization = await this.$Licence.getLicence();
-        this.entity.slug = "user"
-        this.entity.owner = this.organization.id
-        this.entity.status = 1
     },
     data() {
         return {
+            modalEntity: {},
             modalInstance: {},
             response: {},
             errors: {},
@@ -42,7 +40,47 @@ export default {
         }
     },
     methods: {
+        async edit() {
+            try {
+                const model = await loadModel('User');
+                let entity = await model.findByPk(this.modalEntity.id)
+                let user = await entity.populateDiff(this.entity);
+                await user.save();
+
+                this.modalInstance.hide();
+                dispatchEvent('saveSuccess', { entity: user });
+                dispatchEvent('tableRefresh');
+                showToast(this.$__i('Usuário editado com sucesso'), 'success');
+                this.entity = {}
+
+            } catch (error) {
+                showToast(this.$__i('Corrija os erros para continuar'), 'error');
+                dispatchEvent('saveErrors', { errors: error.errors });
+            }
+        },
+        async startEdit(entity) {
+            this.entity = {};
+            dispatchEvent('saveErrors', { errors: [] });
+            const model = await loadModel('User');
+            const instance = await model.findByPk(entity.id);
+            this.modalEntity = instance.get({ plain: true });
+            const ignore = ['password', 'repassword'];
+
+            this.entity.slug = "user"
+            Object.keys(entity).forEach((field) => {
+                if(!ignore.includes(field)) {
+                    this.entity[field] = this.modalEntity[field];
+                }
+            });
+            
+            this.modalInstance = this.$openModal('editUser');
+
+        },
         async newUser() {
+            this.entity = {};
+            this.entity.slug = "user"
+            this.entity.owner = this.organization.id
+            this.entity.status = 1
             this.modalInstance = this.$openModal('addUser');
         },
         async save() {
@@ -51,7 +89,6 @@ export default {
                 let entity = new model();
                 
                 await entity.populate(this.entity);
-                entity.password = await encryptPassword(this.entity.password);
                 await entity.save();
 
                 this.modalInstance.hide();
