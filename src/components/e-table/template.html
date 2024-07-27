@@ -1,6 +1,6 @@
 <div class="e-table">
     <div class="row add">
-        <div class="col-md-2">
+        <div v-if="canUserCreate" class="col-md-2">
            <slot name="addButton">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#'+addModalIdentifier">
                 <e-icon name="add" color="#fff"></e-icon>
@@ -22,8 +22,13 @@
     </div>
 
     <div class="row count-ref">
-        <small>
+        <small v-if="records.length > 0">
             {{$__i('Exibindo')}} {{filters.maxRecords > count ? count : filters.maxRecords}} {{$__i('dos')}} {{count}}
+            {{$__i('Registros encontados')}}
+        </small>
+
+        <small v-if="records.length <= 0">
+            {{$__i('Exibindo')}} 0 {{$__i('dos')}} 0
             {{$__i('Registros encontados')}}
         </small>
     </div>
@@ -36,7 +41,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in records">
+            
+            <tr  v-if="records.length <= 0">
+                <td :colspan="columns.length">{{$__i('Não foram encontrados registros')}}</td>
+            </tr>
+            <tr v-if="records.length > 0" v-for="item in records">
                 <template v-for="column in columns">
                     <td scope="row" v-if="column.slug !== 'actions'">
                         <slot :name="column.slug" :item="item">
@@ -76,7 +85,7 @@
         </tbody>
     </table>
 
-    <div class="row">
+    <div class="row" v-if="records.length > 0">
         <nav aria-label="..." class="pagination-area">
             <ul class="pagination">
                 <li class="page-item" v-if="currentPage > 1">

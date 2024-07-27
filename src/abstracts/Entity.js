@@ -276,8 +276,12 @@ class Entity extends Model {
         return false;
     }
 
+    async canUserAccessArea(userId = null) {
+        return this.checkPermission('accessArea', userId, true);
+    }
+
     async canUserCreate(userId = null) {
-        return this.checkPermission('create', userId);
+        return this.checkPermission('create', userId, true);
     }
 
     async canUserView(userId = null) {
@@ -296,7 +300,7 @@ class Entity extends Model {
         return this.checkPermission('alsterStatus', userId);
     }
 
-    async checkPermission(action, userId = null) {
+    async checkPermission(action, userId = null, singlePermission = false) {
         const _userId = userId || globalThis.authUser.id;
         if(await globalThis.authUser.isAdmin(_userId)) {
             return true;
@@ -304,7 +308,14 @@ class Entity extends Model {
         
         const Permission = require('../models/Permission');
         const objectType = this.constructor.name;
-        if(await Permission.findBy({userId: _userId, action: action, objectType: objectType, objectId: this.id})) {
+
+        // Permissão granular por registro
+        if(!singlePermission && await Permission.findBy({userId: _userId, action: action, objectType: objectType, objectId: this.id})) {
+            return true;
+        }
+
+        // Permissão em toda entidade
+        if(singlePermission && await Permission.findBy({userId: _userId, action: action, objectType: objectType})) {
             return true;
         }
 

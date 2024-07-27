@@ -6,7 +6,7 @@ export default {
             licenceActive: false,
             info: {},
             version: process.env.VUE_APP_VERSION,
-            showUserAction: false
+            showUserAction: false,
         };
     },
     methods: {
@@ -17,7 +17,7 @@ export default {
         },
         toggleUserAction() {
             this.showUserAction = !this.showUserAction
-        }
+        },
     },
     async mounted() {
         this.licenceActive = await this.$licenceActive;

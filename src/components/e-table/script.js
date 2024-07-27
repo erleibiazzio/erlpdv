@@ -8,6 +8,10 @@ import { showToast } from '../../Helpers/Utils';
 export default {
     name: 'e-table',
     async mounted() {
+        this.model = await loadModel(this.type);
+        const entity = new this.model()
+        this.canUserCreate = await entity.canUser('create');
+
         window.addEventListener("tableRefresh", this.fetchRecords);
         await this.fetchRecords();
     },
@@ -39,6 +43,8 @@ export default {
     },
     data() {
         return {
+            canUserCreate: false,
+            model: null,
             count: 0,
             pages: 0,
             filters: {
@@ -101,25 +107,25 @@ export default {
             this.records = [];
 
             if (this.type) {
-                const model = await loadModel(this.type);
-                this.pagination(model);
+                this.pagination(this.model);
 
                 let offset = (this.currentPage - 1) * this.filters.maxRecords
 
-                const records = await model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
-
+                const records = await this.model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
 
                 for (const record of records){
-                    let data = record;
-                    data.currentPermissions = {
-                        canUserCreate: await record.canUser('create'),
-                        canUserView: await record.canUser('view'),
-                        canUserModify: await record.canUser('modify'),
-                        canUserDelete: await record.canUser('delete'),
-                        canUserAlterStatus: await record.canUser('alterStatus'),
-                    };
-                    
-                    this.records.push(data);
+                    if(await record.canUser('view')) {
+                        let data = record;
+                        data.currentPermissions = {
+                            canUserCreate: await record.canUser('create'),
+                            canUserView: await record.canUser('view'),
+                            canUserModify: await record.canUser('modify'),
+                            canUserDelete: await record.canUser('delete'),
+                            canUserAlterStatus: await record.canUser('alterStatus'),
+                        };
+                        
+                        this.records.push(data);
+                    }
                 }
             } else {
                 this.records = this.entities
