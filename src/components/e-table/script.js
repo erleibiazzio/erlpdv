@@ -40,7 +40,12 @@ export default {
             type: Array,
             default: ['edit', 'trash', 'locked', 'unlocked']
         },
+        keyWordsFilters: {
+            type: [Boolean, Array],
+            default: false
+        },
     },
+
     data() {
         return {
             canUserCreate: false,
@@ -56,8 +61,17 @@ export default {
             currentPage: 1,
             maxVisiblePages: 5,
             entityModal: {},
-            modalInstance: {}
+            modalInstance: {},
+            searchTimeout: null,
+            keyword: ""
         };
+    },
+    watch: {
+        'filters.search'(_new, _old) {
+            if (_new != _old) {
+                this.searchKeyWords(_new);
+            }
+        },
     },
     computed: {
         maxRecordsOtions() {
@@ -88,11 +102,31 @@ export default {
         }
     },
     methods: {
+        searchKeyWords(keyword) {
+            this.keyword = "";
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.keyword = keyword || ""
+                this.fetchRecords();
+            }, 1500);
+
+        },
         async pagination(model) {
+            let where = { status: { [Op.gt]: 0 } };
+            if (this.keyword && this.keyWordsFilters) {
+
+                let filters = [];
+                this.keyWordsFilters.forEach(element => {
+                    let data = { [element]: { [Op.like]: `%${this.keyword}%` } }
+                    filters.push(data);
+                    
+                });
+
+                where[Op.or] = filters
+            }
+
             this.count = await model.count({
-                where: {
-                    status: { [Op.gte]: 1 }
-                }
+                where: where
             });
 
             this.pages = Math.ceil(this.count / this.filters.maxRecords);
@@ -111,10 +145,24 @@ export default {
 
                 let offset = (this.currentPage - 1) * this.filters.maxRecords
 
-                const records = await this.model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
+                let where = { status: { [Op.gt]: 0 } }
 
-                for (const record of records){
-                    if(await record.canUser('view')) {
+                if (this.keyword && this.keyWordsFilters) {
+
+                    let filters = [];
+                    this.keyWordsFilters.forEach(element => {
+                        let data = { [element]: { [Op.like]: `%${this.keyword}%` } }
+                        filters.push(data);
+                        
+                    });
+    
+                    where[Op.or] = filters
+                }
+
+                const records = await this.model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: where });
+
+                for (const record of records) {
+                    if (await record.canUser('view')) {
                         let data = record;
                         data.currentPermissions = {
                             canUserCreate: await record.canUser('create'),
@@ -123,7 +171,7 @@ export default {
                             canUserDelete: await record.canUser('delete'),
                             canUserAlterStatus: await record.canUser('alterStatus'),
                         };
-                        
+
                         this.records.push(data);
                     }
                 }
@@ -158,26 +206,26 @@ export default {
 
             this.$nextTick(() => {
                 const inputElement = this.$refs.currentPageInput;
-                inputElement.select(); 
+                inputElement.select();
             });
 
             this.goToPage(page);
         },
         selectValue() {
             const inputElement = this.$refs.currentPageInput;
-            inputElement.select(); 
+            inputElement.select();
         },
         async alterStatus(item, status) {
             const model = await loadModel(this.type);
             let entity = await model.findOne({ where: { id: item.id } });
 
-            if(!await entity.canUser('alterStatus')) {
+            if (!await entity.canUser('alterStatus')) {
                 showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
                 return;
             }
 
             entity.status = parseInt(entity.statusByName(status));
-            
+
             this.entityModal = {
                 entity: entity,
                 status: entity.statusIdByName(status)
@@ -187,7 +235,7 @@ export default {
         },
         async editStatus() {
             try {
-                if(!await this.entityModal.entity.canUser('alterStatus')) {
+                if (!await this.entityModal.entity.canUser('alterStatus')) {
                     showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
                     return;
                 }
@@ -203,8 +251,8 @@ export default {
         async deleteEntity(item) {
             const model = await loadModel(this.type);
             let entity = await model.findOne({ where: { id: item.id } });
-            
-            if(!await entity.canUser('delete')) {
+
+            if (!await entity.canUser('delete')) {
                 showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
                 return;
             }
@@ -218,11 +266,11 @@ export default {
             this.modalInstance = this.$openModal('deleteModal');
         },
         async deleteRecord(entity) {
-            if(!await entity.canUser('delete')) {
+            if (!await entity.canUser('delete')) {
                 showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
                 return;
             }
-            
+
             await entity.save();
             await this.fetchRecords();
             showToast('Registro deletado com sucesso');

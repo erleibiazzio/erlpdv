@@ -9,6 +9,7 @@ export default {
     },
     data() {
         return {
+            keyWordsFilters: ['username', 'name', 'email'],
             modalEntity: {},
             modalInstance: {},
             response: {},

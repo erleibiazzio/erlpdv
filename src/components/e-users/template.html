@@ -1,6 +1,6 @@
 <e-theme>
     <e-breadcrumb :label="$__i('Usuários')" icon="users" :navigation="breadcrumb"></e-breadcrumb>
-    <e-table type="User" :columns="columns" addModalIdentifier="addUser">
+    <e-table type="User" :columns="columns" addModalIdentifier="addUser" :keyWordsFilters="keyWordsFilters">
         <template #addButton="{addActions}">
             <button type="button" class="btn btn-primary" @click="newUser()">
                 <e-icon name="add" color="#fff"></e-icon>
