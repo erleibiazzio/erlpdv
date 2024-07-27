@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 // src/abstracts/Entity.js
 const { Model, DataTypes } = require('sequelize');
 const McDate = require('../Helpers/McDate').default;
 const Response = require('../Helpers/Response').default;
+const { ucfirst } = require('../Helpers/Utils');
 
 /**
  * Classe base para entidades utilizando Sequelize.
@@ -54,6 +57,12 @@ class Entity extends Model {
                     return new McDate(rawValue);
                 },
             },
+            modelType: {
+                type: DataTypes.VIRTUAL,
+                get() {
+                    return this.constructor.name.toLowerCase();
+                },
+            },
         };
 
         const allAttributes = {
@@ -64,6 +73,8 @@ class Entity extends Model {
 
         options = options || {};
         options.timestamps = true; // Adiciona opção comum para timestamps
+
+
         return super.init(allAttributes, options);
     }
 
@@ -257,6 +268,53 @@ class Entity extends Model {
         }
     }
 
+    async hasMethod(method) {
+        if (method in this) {
+            return true
+        }
+
+        return false;
+    }
+
+    async canUserCreate(userId = null) {
+        return this.checkPermission('create', userId);
+    }
+
+    async canUserView(userId = null) {
+       return this.checkPermission('view', userId);
+    }
+
+    async canUserModify(userId = null) {
+        return this.checkPermission('modify', userId);
+    }
+
+    async canUserDelete(userId = null) {
+        return this.checkPermission('delete', userId);
+    }
+
+    async canUserAlterStatus(userId = null) {
+        return this.checkPermission('alsterStatus', userId);
+    }
+
+    async checkPermission(action, userId = null) {
+        const _userId = userId || globalThis.authUser.id;
+        if(await globalThis.authUser.isAdmin(_userId)) {
+            return true;
+        }
+        
+        const Permission = require('../models/Permission');
+        const objectType = this.constructor.name;
+        if(await Permission.findBy({userId: _userId, action: action, objectType: objectType, objectId: this.id})) {
+            return true;
+        }
+
+        return false;
+    }
+
+    async canUser(action, userId = null) {      
+        const method = `canUser${ucfirst(action)}`;
+        return await eval(`this.${method}(${userId})`);
+    }
 }
 
 module.exports = Entity;

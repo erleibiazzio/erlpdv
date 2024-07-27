@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 import { loadModel } from '../../Helpers/loadModels';
 const { Op } = require('sequelize');
@@ -97,23 +98,31 @@ export default {
             }
         },
         async fetchRecords() {
-            try {
-                if (this.type) {
-                    const model = await loadModel(this.type);
-                    this.pagination(model);
+            this.records = [];
 
-                    let offset = (this.currentPage - 1) * this.filters.maxRecords
+            if (this.type) {
+                const model = await loadModel(this.type);
+                this.pagination(model);
 
-                    const records = await model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
-                    this.records = records.map(record => record.get({ plain: true }));
-                    if (records.length > 0) {
-                        this.headers = Object.keys(records[0].get({ plain: true }));
-                    }
-                } else {
-                    this.records = this.entities
+                let offset = (this.currentPage - 1) * this.filters.maxRecords
+
+                const records = await model.findAll({ limit: parseInt(this.filters.maxRecords), offset: offset, where: { status: { [Op.gt]: 0 } } });
+
+
+                for (const record of records){
+                    let data = record;
+                    data.currentPermissions = {
+                        canUserCreate: await record.canUser('create'),
+                        canUserView: await record.canUser('view'),
+                        canUserModify: await record.canUser('modify'),
+                        canUserDelete: await record.canUser('delete'),
+                        canUserAlterStatus: await record.canUser('alterStatus'),
+                    };
+                    
+                    this.records.push(data);
                 }
-            } catch (error) {
-                console.error('Failed to fetch records:', error);
+            } else {
+                this.records = this.entities
             }
         },
         async goToPage(page) {
@@ -156,6 +165,11 @@ export default {
             const model = await loadModel(this.type);
             let entity = await model.findOne({ where: { id: item.id } });
 
+            if(!await entity.canUser('alterStatus')) {
+                showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                return;
+            }
+
             entity.status = parseInt(entity.statusByName(status));
             
             this.entityModal = {
@@ -167,6 +181,11 @@ export default {
         },
         async editStatus() {
             try {
+                if(!await this.entityModal.entity.canUser('alterStatus')) {
+                    showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                    return;
+                }
+
                 await this.entityModal.entity.save();
                 await this.fetchRecords();
                 showToast('Status alterado com sucesso');
@@ -178,6 +197,12 @@ export default {
         async deleteEntity(item) {
             const model = await loadModel(this.type);
             let entity = await model.findOne({ where: { id: item.id } });
+            
+            if(!await entity.canUser('delete')) {
+                showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                return;
+            }
+
             entity.status = entity.statusByName('trash');
 
             this.entityModal = {
@@ -187,11 +212,16 @@ export default {
             this.modalInstance = this.$openModal('deleteModal');
         },
         async deleteRecord(entity) {
+            if(!await entity.canUser('delete')) {
+                showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                return;
+            }
+            
             await entity.save();
             await this.fetchRecords();
             showToast('Registro deletado com sucesso');
 
             this.modalInstance.hide();
-        }
+        },
     },
 };

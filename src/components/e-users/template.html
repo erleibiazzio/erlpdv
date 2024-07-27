@@ -23,7 +23,7 @@
         </template>
 
         <template #tableEdit="{table}">
-            <a href="#" @click="startEdit(table.item)">
+            <a v-if="table.item.currentPermissions.canUserModify" href="#" @click="startEdit(table.item) ">
                 <e-icon name="edit" color="#caca3a"></e-icon>
             </a>
         </template>

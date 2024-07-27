@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
@@ -9,8 +10,25 @@ import router from './router';
 const { __i, openModal } = require('./Helpers/Utils');
 import './assets/sass/global.scss';
 import Licence from './models/Licence';
+import User from './models/User';
+import Role from './models/Role';
+import { getSession } from './session';
 import API from './Helpers/API';
 import { useAuthStore } from './stores/auth';
+import { useGlobalStore } from './stores/globalStore';
+import { usePermissionStore } from './stores/permissionStore';
+
+let userAuth =  null
+let session =  null
+let role =  null
+const sessionStorage = localStorage.getItem('sessionId');
+if (sessionStorage) {
+    session = await getSession(sessionStorage);
+    if (session) {
+        userAuth = await User.findByPk(session.userId);
+        role =  await Role.findByPk(userAuth.id);
+    }
+}
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -21,6 +39,12 @@ app.config.globalProperties.$__i = __i;
 app.config.globalProperties.$openModal = openModal;
 app.config.globalProperties.$api = new API();
 app.config.globalProperties.$licenceActive = await Licence.isActive();
+
+// Copartilhamento global
+globalThis.authUser = userAuth
+globalThis.user =  {
+    role: role
+}
 
 // Registrando componentes globais
 import EAlert from './components/e-alert/ErIndex.vue';
@@ -55,9 +79,21 @@ app.use(pinia); // Importante: configurar o Pinia antes de usar qualquer store
 
 // Criando a instância da store de autenticação
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
+const permissionStore = usePermissionStore();
+
+if(session && userAuth) {
+    authStore.login({
+        user: userAuth,
+        sessionId: session.sessionId,
+        role: role
+    });
+}
 
 // Registrando a store de autenticação globalmente
 app.config.globalProperties.$authStore = authStore;
+app.config.globalProperties.$globalStore = globalStore;
+app.config.globalProperties.$permissionStore = permissionStore;
 
 // Montando a aplicação Vue no elemento com id 'app' no HTML
 app.mount('#app');

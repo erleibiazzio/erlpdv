@@ -48,23 +48,23 @@
                         <slot :name="column.slug" :item="item">
                             <div class="actions">
                                 <slot name="tableEdit" :table="{item, actionOptions}">
-                                    <a href="#" v-if="actionOptions.includes('edit')">
+                                    <a href="#" v-if="actionOptions.includes('edit') && item.currentPermissions.canUserModify">
                                         <e-icon name="edit" color="#caca3a"></e-icon>
                                     </a>
                                 </slot>
                                 <slot name="tableAlterStatusLocked" :table="{item, alterStatus,actionOptions}">
-                                    <a href="#" v-if="actionOptions.includes('locked') && item.status == 1" @click="alterStatus(item, 'disabled')">
+                                    <a href="#" v-if="actionOptions.includes('locked') && item.status == 1 && item.currentPermissions.canUserAlterStatus" @click="alterStatus(item, 'disabled')">
                                         <e-icon name="locked" color="red"></e-icon>
                                     </a>
                                 </slot>
                                 <slot name="tableAlterStatusUnlocked" :table="{item, alterStatus,actionOptions}">
-                                    <a href="#" v-if="actionOptions.includes('unlocked') && item.status == 2" @click="alterStatus(item, 'enabled')">
+                                    <a href="#" v-if="actionOptions.includes('unlocked') && item.status == 2 && item.currentPermissions.canUserAlterStatus" @click="alterStatus(item, 'enabled')">
                                         <e-icon name="unlocked" color="#07c107"></e-icon>
                                     </a>
                                 </slot>
 
                                 <slot name="tableTrash" :table="{item, deleteEntity,actionOptions}">
-                                    <a href="#" v-if="actionOptions.includes('trash')"  @click="deleteEntity(item)">
+                                    <a href="#" v-if="actionOptions.includes('trash') && item.currentPermissions.canUserDelete"  @click="deleteEntity(item)">
                                         <e-icon name="trash" color="red"></e-icon>
                                     </a>
                                 </slot>

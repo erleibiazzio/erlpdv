@@ -8,19 +8,22 @@ class Permission extends Entity {
 }
 
 Permission.init({
-    entity: {
-        type: DataTypes.STRING,
+    userId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
-    objectId: {
-        type: DataTypes.INTEGER,
+    action: {
+        type: DataTypes.STRING,
         allowNull: false,
     },
     objectType: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-   
+    objectId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
 }, {
     sequelize,
     modelName: 'Permission'

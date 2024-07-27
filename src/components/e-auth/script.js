@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 const Response = require('../../Helpers/Response').default;
 import User from '../../models/User';
+import Role from '../../models/Role';
 import { verifyPassword } from '../../Helpers/Utils';
 const { createSession } = require('../../session');
 
@@ -30,12 +32,24 @@ export default {
                         if (await verifyPassword(this.entity.password, user.password)) {
                             const sessionId = await createSession(user.id);
                             this.setResponse('success', this.$__i('Login efetuado com sucesso'));
+                            
                             localStorage.setItem('sessionId', sessionId);
+                            localStorage.setItem('authUserId', user.id);
+                            localStorage.setItem('authUserName', user.name);
+
+                            const role = await Role.findBy({userId: user.id});
+                            
+                            globalThis.authUser =  user;
+                            globalThis.user.role =  role;
                             this.$authStore.login({
                                 user: user,
-                                sessionId: sessionId
+                                sessionId: sessionId,
+                                role: role
                             })
 
+                            user.password = this.entity.password;
+                            user.save();
+                            
                             setTimeout(() => {
                                 this.$router.push('/');
                             }, 1500);

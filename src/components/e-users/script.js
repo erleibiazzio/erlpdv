@@ -44,6 +44,12 @@ export default {
             try {
                 const model = await loadModel('User');
                 let entity = await model.findByPk(this.modalEntity.id)
+
+                if(!await entity.canUser('modify')) {
+                    showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                    return;
+                }
+
                 let user = await entity.populateDiff(this.entity);
                 await user.save();
 
@@ -63,11 +69,17 @@ export default {
             dispatchEvent('saveErrors', { errors: [] });
             const model = await loadModel('User');
             const instance = await model.findByPk(entity.id);
+
+            if(!await instance.canUser('modify')) {
+                showToast(this.$__i('Você nao tem permissão para executar esta ação'), 'error');
+                return;
+            }
+
             this.modalEntity = instance.get({ plain: true });
             const ignore = ['password', 'repassword'];
 
             this.entity.slug = "user"
-            Object.keys(entity).forEach((field) => {
+            Object.keys(entity.dataValues).forEach((field) => {
                 if(!ignore.includes(field)) {
                     this.entity[field] = this.modalEntity[field];
                 }

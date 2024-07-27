@@ -63,5 +63,9 @@ function dispatchEvent(name, params = {}) {
     window.dispatchEvent(new CustomEvent(name, { detail: params }));
 }
 
+function ucfirst(string) {
+    if (!string) return string;
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
-export { __i, encryptPassword, verifyPassword, showToast, openModal, dispatchEvent };
+export { __i, encryptPassword, verifyPassword, showToast, openModal, dispatchEvent, ucfirst };

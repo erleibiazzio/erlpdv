@@ -1,12 +1,40 @@
+/* eslint-disable no-undef */
 // src/models/User.js
 const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../database');
 const Entity = require('../abstracts/Entity');
 const { validateCPF, validateCNPJ } = require('../Helpers/validators');
 const { encryptPassword } = require('../Helpers/Utils');
+const Role = require('./Role');
 
 class User extends Entity {
-    // Defina atributos específicos do modelo User, se necessário
+    async isAdmin(userId) {
+        const _userId = userId || this.id;
+        const role = await Role.findBy({userId: _userId});
+        if(role && role.role === 'admin') {
+            return true
+        }
+
+        return false;
+    }
+
+    async canUserDelete(userId = null) {
+
+        if(this.id == globalThis.authUser.id) {
+            return false;
+        }
+
+        return this.checkPermission('delete', userId);
+    }
+
+    async canUserAlterStatus(userId = null) {
+
+        if(this.id == globalThis.authUser.id) {
+            return false;
+        }
+
+        return this.checkPermission('alsterStatus', userId);
+    }
 }
 
 // Função para verificar unicidade de campos
