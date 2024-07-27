@@ -10,6 +10,7 @@
                 <a href="#" @click.prevent="toggleUserAction()">
                     <e-icon name="avatar" size="32:32"></e-icon>
                 </a>
+                {{$authStore.user.username}}
             </div>
 
             <div class="actions bg-secondary" v-if="showUserAction">
