@@ -1,3 +1,6 @@
+import { loadModel } from '../../Helpers/loadModels';
+
+
 export default {
     name: 'e-menu',
     props: {
@@ -16,12 +19,28 @@ export default {
         iconSize: {
             type: String,
             default: "24:24"
-        }
+        },
+        type: {
+            type: String,
+            default: 'bayPass'
+        },
 
     },
     data() {
-        return {};
+        return {
+            canAccess: true,
+        };
     },
-    async mounted() { },
-    methods: {},
+    async mounted() { 
+        this._canAccess()
+    },
+    methods: {
+        async _canAccess() {
+            if(this.type != "bayPass") {
+                const model = await loadModel(this.type);
+                const entity = new model()
+                this.canAccess = await entity.canUser('accessArea');
+            }
+        },
+    },
 };

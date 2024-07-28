@@ -10,7 +10,7 @@
                 <a href="#" @click.prevent="toggleUserAction()">
                     <e-icon name="avatar" size="32:32"></e-icon>
                 </a>
-                {{$authStore.user.username}}
+                {{$authStore.user?.username}}
             </div>
 
             <div class="actions bg-secondary" v-if="showUserAction">
@@ -27,7 +27,7 @@
         <aside class="col-md-2 bg-light border-right">
             <ul class="nav flex-column">
                 <e-menu route="/" :label="$__i('Principal')" icon="dashboard"></e-menu>
-                <e-menu route="/users" :label="$__i('Usuários')" icon="users"></e-menu>
+                <e-menu route="/users" :label="$__i('Usuários')" icon="users" type="User"></e-menu>
             </ul>
         </aside>
 

@@ -1,4 +1,4 @@
-<li class="nav-item">
+<li v-if="canAccess" class="nav-item">
     <e-icon v-if="icon" :name="icon" :size="iconSize"></e-icon>
     <router-link :to="route" class="nav-link">{{label}}</router-link>
 </li>
