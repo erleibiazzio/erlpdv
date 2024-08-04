@@ -58,7 +58,6 @@ export default {
             const Permission = await loadModel('Permission');
             userPermissions = await Permission.findAll({where: {userId: entity.id}});
 
-            console.log(userPermissions)
             if(userPermissions) {
                 for (const permission of userPermissions) {
                     let target = `${permission.objectType}:${permission.action}`;
