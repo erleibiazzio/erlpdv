@@ -6,6 +6,9 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import dotenv from 'dotenv'
+import cron from 'node-cron'
+import permissionQueue from './models/PermissionQueue'
+
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -57,6 +60,16 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+
+   // Configurando a tarefa agendada para rodar a cada minuto
+   cron.schedule('* * * * * *', async () => {
+    try {
+      let queue = new permissionQueue();
+      await queue.runQueue();
+    } catch (error) {
+      console.error('Erro na tarefa agendada:', error);
+    }
+  });
 })
 
 if (isDevelopment) {

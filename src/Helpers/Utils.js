@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import { Modal } from 'bootstrap';
 
 const saltRounds = 12;
 
@@ -42,23 +41,6 @@ function showToast(message, type = 'success', time = 1500, icon = null) {
     window.dispatchEvent(new CustomEvent('showToast', { detail: { message: message, type: type, icon: icon, time: time } }));
 }
 
-/**
- * Abre um modal específico na página.
- *
- * @param {String} identifier - O identificador (ID) do elemento HTML do modal a ser aberto.
- * @returns {Modal} - Retorna a instância do modal aberto.
- *
- * @example
- * // Supondo que você tenha um modal com o ID 'exampleModal', você pode abri-lo assim:
- * const modalInstance = openModal('exampleModal');
- */
-function openModal(identifier) {
-    const modal = document.getElementById(identifier);
-    const modalInstance = new Modal(modal);
-    modalInstance.show();
-    return modalInstance;
-}
-
 function dispatchEvent(name, params = {}) {
     window.dispatchEvent(new CustomEvent(name, { detail: params }));
 }
@@ -68,4 +50,4 @@ function ucfirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export { __i, encryptPassword, verifyPassword, showToast, openModal, dispatchEvent, ucfirst };
+export { __i, encryptPassword, verifyPassword, showToast, dispatchEvent, ucfirst };

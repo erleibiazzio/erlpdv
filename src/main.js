@@ -7,7 +7,8 @@ import { vMaska } from "maska/vue";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import router from './router';
-const { __i, openModal } = require('./Helpers/Utils');
+const { __i } = require('./Helpers/Utils');
+const { openModal,closeModal } = require('./Helpers/Modal');
 import './assets/sass/global.scss';
 import Licence from './models/Licence';
 import User from './models/User';
@@ -37,6 +38,7 @@ const pinia = createPinia();
 app.config.globalProperties.$Licence = Licence;
 app.config.globalProperties.$__i = __i;
 app.config.globalProperties.$openModal = openModal;
+app.config.globalProperties.$closeModal = closeModal;
 app.config.globalProperties.$api = new API();
 app.config.globalProperties.$licenceActive = await Licence.isActive();
 

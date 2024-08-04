@@ -44,6 +44,10 @@ export default {
             type: [Boolean, Array],
             default: false
         },
+        complementCurrentPermissions: {
+            type: [Boolean, Array],
+            default: false
+        }
     },
 
     data() {
@@ -164,13 +168,22 @@ export default {
                 for (const record of records) {
                     if (await record.canUser('view')) {
                         let data = record;
-                        data.currentPermissions = {
+
+                        data.currentPermissions =  {
                             canUserCreate: await record.canUser('create'),
                             canUserView: await record.canUser('view'),
                             canUserModify: await record.canUser('modify'),
                             canUserDelete: await record.canUser('delete'),
                             canUserAlterStatus: await record.canUser('alterStatus'),
                         };
+
+                        if(this.complementCurrentPermissions) {
+
+                            for(let permission of this.complementCurrentPermissions) {
+                                let method = "canUser"+permission.charAt(0).toUpperCase() + permission.slice(1);
+                                data.currentPermissions[method] = await record.canUser(permission)
+                            }
+                        }
 
                         this.records.push(data);
                     }

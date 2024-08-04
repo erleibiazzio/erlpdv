@@ -1,6 +1,6 @@
 <e-theme>
     <e-breadcrumb :label="$__i('Usuários')" icon="users" :navigation="breadcrumb"></e-breadcrumb>
-    <e-table type="User" :columns="columns" addModalIdentifier="addUser" :keyWordsFilters="keyWordsFilters">
+    <e-table type="User" :columns="columns" addModalIdentifier="addUser" :keyWordsFilters="keyWordsFilters" :complementCurrentPermissions="complementCurrentPermissions">
         <template #addButton="{addActions}">
             <button type="button" class="btn btn-primary" @click="newUser()">
                 <e-icon name="add" color="#fff"></e-icon>
@@ -12,14 +12,23 @@
             {{item.status}}
         </template>
 
+        <template #tableActionsBefore="{table}">
+            <a v-if="table.item.currentPermissions.canUserAlterPermissions" href="#" @click="alterPermission(table.item) ">
+                <e-icon name="protected" color="#119603"></e-icon>
+            </a>
+        </template>
+
         <template #alterStatusModalBody="{entityModal}">
             <h3 class="text-danger">{{$__i('Atenção')}}</h3>
-            {{$__i('Você esta alterando o status do usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong> para <strong class="text-danger">{{entityModal.status}}</strong>. {{$__i('Deseja continuar?')}}
+            {{$__i('Você esta alterando o status do usuário')}} <strong
+                class="text-primary">{{entityModal.entity?.username}}</strong> para <strong
+                class="text-danger">{{entityModal.status}}</strong>. {{$__i('Deseja continuar?')}}
         </template>
 
         <template #deleteModalBody="{entityModal}">
             <h3 class="text-danger">{{$__i('Atenção')}}</h3>
-            {{$__i('Você esta deletando o usuário')}} <strong class="text-primary">{{entityModal.entity?.username}}</strong>. {{$__i('Deseja continuar?')}}
+            {{$__i('Você esta deletando o usuário')}} <strong
+                class="text-primary">{{entityModal.entity?.username}}</strong>. {{$__i('Deseja continuar?')}}
         </template>
 
         <template #tableEdit="{table}">
@@ -37,15 +46,18 @@
             </div>
 
             <div class="row">
-                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4" mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
+                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4"
+                    mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
                 <e-field :entity="entity" prop="email" type="text" :label="$__i('E-mail')" size="4"></e-field>
                 <e-field :entity="entity" prop="username" type="text" :label="$__i('Usuario')" size="4"></e-field>
             </div>
 
             <div class="row">
                 <e-field :entity="entity" prop="password" type="password" :label="$__i('Senha')" size="5"></e-field>
-                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')" size="5" required></e-field>
-                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"  :label="$__i('Status')" size="2"></e-field>
+                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')"
+                    size="5" required></e-field>
+                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"
+                    :label="$__i('Status')" size="2"></e-field>
 
             </div>
 
@@ -54,7 +66,7 @@
             </div>
 
             <template #actions="{modal}">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
                 <button type="button" class="btn btn-primary" @click="save(modal)">{{$__i('Salvar')}}</button>
             </template>
         </e-modal>
@@ -65,15 +77,18 @@
             </div>
 
             <div class="row">
-                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4" mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
+                <e-field :entity="entity" prop="document" type="fieldMask" :label="$__i('CPF/CNPJ')" size="4"
+                    mask="['###.###.###-##', '##.###.###/####-##']"></e-field>
                 <e-field :entity="entity" prop="email" type="text" :label="$__i('E-mail')" size="4"></e-field>
                 <e-field :entity="entity" prop="username" type="text" :label="$__i('Usuario')" size="4"></e-field>
             </div>
 
             <div class="row">
                 <e-field :entity="entity" prop="password" type="password" :label="$__i('Senha')" size="5"></e-field>
-                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')" size="5" required></e-field>
-                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"  :label="$__i('Status')" size="2"></e-field>
+                <e-field :entity="entity" prop="repassword" type="password" :label="$__i('Confirme a senha')"
+                    size="5" required></e-field>
+                <e-field :entity="entity" prop="status" type="select" :options="statusOptions"
+                    :label="$__i('Status')" size="2"></e-field>
 
             </div>
 
@@ -82,8 +97,30 @@
             </div>
 
             <template #actions="{modal}">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >{{$__i('Fechar')}}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
                 <button type="button" class="btn btn-warning" @click="edit()">{{$__i('Editar')}}</button>
+            </template>
+        </e-modal>
+
+        <e-modal :title="$__i('Alterar permissões')" :entity="entity" identifier="alterPermissions" type="xl">
+            <div class="user-permissions">
+                <div v-for="item in permissions">
+                    <e-card>
+                        <template #header>
+                            <label class="card-label">{{item.label}}</label>
+                        </template>
+
+                        <template #content>
+                            <div v-for="permission in item.permissions">
+                                <e-field :entity="userPermissions" :prop="item.slug+':'+permission.type" type="checkbox" :label="permission.label" size="12"></e-field>
+                            </div>
+                        </template>
+                    </e-card>
+                </div>
+            </div>
+            <template #actions="{modal}">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$__i('Fechar')}}</button>
+                <button type="button" class="btn btn-success" @click="savePermissions()">{{$__i('Salvar')}}</button>
             </template>
         </e-modal>
     </template>

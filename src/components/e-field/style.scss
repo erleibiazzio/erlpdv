@@ -10,4 +10,10 @@
     & .field-error {
        border-color: red;     
     }
+
+    .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
 }

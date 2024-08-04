@@ -1,5 +1,5 @@
 <div :class="'e-field mb-3 col-md-'+size">
-    <div class="label">
+    <div v-if="type != 'checkbox'" class="label">
         <small class="fields-required" v-if="isRequired()">*</small>
         <label :for="fieldId">{{label}}</label>
     </div>
@@ -16,6 +16,11 @@
     <div v-if="is('password')" class="form-group">
         <input :type="type" :id="fieldId" v-model="entity[prop]" :placeholder="placeholder" class="form-control"
             :class="{'field-error': hasError()}">
+    </div>
+
+    <div v-if="is('checkbox')" class="checkbox">
+        <input :type="type" :id="fieldId" v-model="entity[prop]" :placeholder="placeholder" :class="{'field-error': hasError()}">
+        <label :for="fieldId">{{label}}</label>
     </div>
 
     <div v-if="is('select')" class="form-group">

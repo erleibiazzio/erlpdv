@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 // src/models/User.js
 const { DataTypes, Sequelize } = require('sequelize');
@@ -8,7 +9,7 @@ const { encryptPassword } = require('../Helpers/Utils');
 const Role = require('./Role');
 
 class User extends Entity {
-    async isAdmin(userId) {
+    async isAdmin(userId =  null) {
         const _userId = userId || this.id;
         const role = await Role.findBy({userId: _userId});
         if(role && role.role === 'admin') {
@@ -34,6 +35,24 @@ class User extends Entity {
         }
 
         return this.checkPermission('alsterStatus', userId);
+    }
+
+    async canUserAlterPermissions(userId = null) {
+
+        if(this.id == globalThis.authUser.id) {
+            return false;
+        }
+
+        return this.checkPermission('alterPermissions', userId, true);
+    }
+
+    async  clearAllPermissions() {
+        const query = "DELETE FROM Permissions WHERE userId = :id";
+        const replacements = { id: this.id };
+       return sequelize.query(query, {
+            replacements: replacements,
+            type: sequelize.QueryTypes.DELETE,
+        })
     }
 }
 

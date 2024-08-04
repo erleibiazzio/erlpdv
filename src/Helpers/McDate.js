@@ -1,3 +1,5 @@
+// src/Helpers/McDate.js
+
 class McDate {
     constructor(date) {
         this.locale = process.env.VUE_APP_LOCALE || 'pt-BR'; // Usa VUE_APP_LOCALE ou padrão 'pt-BR'
@@ -23,9 +25,9 @@ class McDate {
     }
 
     sql(options) {
-        let year = this._date.getFullYear();
-        let month = String(this._date.getMonth() + 1).padStart(2, '0');
-        let day = String(this._date.getDate()).padStart(2, '0');
+        const year = this._date.getFullYear();
+        const month = String(this._date.getMonth() + 1).padStart(2, '0');
+        const day = String(this._date.getDate()).padStart(2, '0');
 
         if (options === 'date') {
             return `${year}-${month}-${day}`;
@@ -40,15 +42,10 @@ class McDate {
     dateTime(options) {
         let result = null;
         if (options === 'sql') {
-            let timeType = '2-digit';
-            if(options.includes('long')) {
-                timeType = timeType + ' long';
-            }
-
+            const timeType = options.includes('long') ? '2-digit long' : '2-digit';
             result = this.sql('date') + ' ' + this.time(timeType);
-            return result;
         } else {
-            options = options?.split(' ') || ['long'];
+            options = options ? options.split(' ') : ['long'];
             const config = { day: 'numeric' };
 
             if (options.includes('year')) {
@@ -73,10 +70,8 @@ class McDate {
             }
 
             result = this.format(config);
-            return result;
         }
-
-
+        return result;
     }
 
     date(options) {
@@ -84,7 +79,7 @@ class McDate {
             return this.sql('date');
         }
 
-        options = options?.split(' ') || ['long'];
+        options = options ? options.split(' ') : ['long'];
         const config = { day: 'numeric' };
 
         if (options.includes('year')) {
@@ -119,43 +114,36 @@ class McDate {
 
     year(format) {
         format = format || 'numeric';
-
         return this.format({ year: format });
     }
 
     month(format) {
         format = format || 'long';
-
         return this.format({ month: format });
     }
 
     weekday(format) {
         format = format || 'long';
-
         return this.format({ weekday: format });
     }
 
     day(format) {
         format = format || 'numeric';
-
         return this.format({ day: format });
     }
 
     hour(format) {
         format = format || 'numeric';
-
         return this.format({ hour: format });
     }
 
     minute(format) {
         format = format || 'numeric';
-
         return this.format({ minute: format });
     }
 
     second(format) {
         format = format || 'numeric';
-
         return this.format({ second: format });
     }
 
