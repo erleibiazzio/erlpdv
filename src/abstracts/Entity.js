@@ -301,7 +301,7 @@ class Entity extends Model {
     }
 
     async canUserAlterStatus(userId = null) {
-        return this.checkPermission('alsterStatus', userId);
+        return this.checkPermission('alterStatus', userId);
     }
 
     async checkPermission(action, userId = null, singlePermission = false) {

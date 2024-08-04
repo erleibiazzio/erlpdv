@@ -34,7 +34,7 @@ class User extends Entity {
             return false;
         }
 
-        return this.checkPermission('alsterStatus', userId);
+        return this.checkPermission('alterStatus', userId);
     }
 
     async canUserAlterPermissions(userId = null) {
