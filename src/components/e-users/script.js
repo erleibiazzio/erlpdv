@@ -2,7 +2,7 @@
 
 import { loadModel } from '../../Helpers/loadModels';
 import { showToast, dispatchEvent } from '../../Helpers/Utils';
-import { listCanUserMethods } from './permissionsDefinitions';
+import { listCanUserMethods } from '../../definitions/permissionsDefinitions';
 
 export default {
     name: 'e-dashboard',
