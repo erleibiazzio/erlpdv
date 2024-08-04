@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import User from '../../models/User';
-import Permission from '../../models/Permission';
+import User from '../models/User';
+const { ucfirst } =  require('../Helpers/Utils');
+
 
 const entities = [
     {
@@ -14,31 +15,38 @@ const entities = [
 const dict = {
     canUserAccessArea: {
         label: "Acessar área admnistrativa",
-        type: "accessArea"
+        type: "accessArea",
+        singlePermission: true
     },
     canUserAlterStatus: {
         label: "Alterar status",
-        type: "alterStatus"
+        type: "alterStatus",
+        singlePermission: false
     },
     canUserCreate: {
         label: "Cadastrar",
-        type: "create"
+        type: "create",
+        singlePermission: false
     },
     canUserView: {
         label: "Visualizar",
-        type: "view"
+        type: "view",
+        singlePermission: false
     },
     canUserModify: {
         label: "Modificar",
-        type: "modify"
+        type: "modify",
+        singlePermission: false
     },
     canUserDelete: {
         label: "Deletar",
-        type: "delete"
+        type: "delete",
+        singlePermission: false
     },
     canUserAlterPermissions: {
         label: "Alterar permissões",
-        type: "alterPermissions"
+        type: "alterPermissions",
+        singlePermission: true
     },
 }
 
@@ -84,5 +92,10 @@ function listCanUserMethods() {
     return permissionsList;
 }
 
+function getPermissionDefinitions(permission) {
+    let target = `canUser${ucfirst(permission)}`
+    return dict[target];
+}
 
-export { listCanUserMethods };
+
+export { listCanUserMethods, getPermissionDefinitions };
