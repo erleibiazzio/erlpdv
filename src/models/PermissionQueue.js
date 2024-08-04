@@ -26,7 +26,6 @@ class PermissionQueue extends Entity {
                     for (const entity of entities) {
 
                         if(queue.objectType == "User" && await entity.isAdmin()) {
-                            console.log("aaa")
                             continue;
                         }
 
